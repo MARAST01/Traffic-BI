@@ -1,4 +1,4 @@
-# [cite_start]Sistema de Business Intelligence para Accidentes de Tránsito en EE.UU (2016-2023) [cite: 3]
+# Sistema de Business Intelligence para Accidentes de Tránsito en EE.UU (2016-2023) [cite: 3]
 
 ## 👥 Integrantes del Proyecto
 [cite_start]Este proyecto fue desarrollado por estudiantes del programa de Ingeniería de Sistemas de la Universidad del Valle, Sede Tuluá[cite: 1, 2, 5]:
