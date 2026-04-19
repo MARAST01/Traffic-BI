@@ -1,0 +1,73 @@
+<aside class="sidebar" [class.sidebar--collapsed]="collapsed()">
+  <!-- Logo -->
+  <div class="sidebar__logo">
+    <div class="sidebar__logo-icon">
+      <lucide-icon name="Activity" [size]="20" />
+    </div>
+    <span class="sidebar__logo-text" [class.hidden]="collapsed()"> Traffic BI </span>
+  </div>
+
+  <!-- Separador -->
+  <div class="sidebar__divider"></div>
+
+  <!-- Navegación -->
+  <nav class="sidebar__nav">
+    <p class="sidebar__nav-label" [class.hidden]="collapsed()">Módulos</p>
+
+    <ul>
+      <li *ngFor="let item of visibleItems()">
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="nav-item--active"
+          [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+          class="nav-item"
+          [class.nav-item--collapsed]="collapsed()"
+          [title]="collapsed() ? item.label : ''"
+        >
+          <!-- Icono -->
+          <span class="nav-item__icon">
+            <lucide-icon [name]="item.icon" [size]="18" />
+          </span>
+
+          <!-- Label + Badge -->
+          <span class="nav-item__label" [class.hidden]="collapsed()">
+            {{ item.label }}
+          </span>
+
+          <span *ngIf="item.badge && !collapsed()" class="nav-item__badge">
+            {{ item.badge }}
+          </span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Spacer -->
+  <div class="flex-1"></div>
+
+  <!-- Separador -->
+  <div class="sidebar__divider"></div>
+
+  <!-- Perfil de usuario -->
+  <div class="sidebar__user" [class.sidebar__user--collapsed]="collapsed()">
+    <div class="user-avatar">
+      {{ userInitials() }}
+    </div>
+
+    <div class="user-info" [class.hidden]="collapsed()">
+      <p class="user-info__name">{{ user()?.name }}</p>
+      <span class="role-badge" [ngClass]="roleClass()">
+        {{ user()?.role }}
+      </span>
+    </div>
+
+    <button
+      class="logout-btn"
+      [class.hidden]="collapsed()"
+      (click)="logout()"
+      title="Cerrar sesión"
+    >
+      <lucide-icon name="LogOut" [size]="16" />
+    </button>
+  </div>
+</aside>

@@ -1,0 +1,117 @@
+<!-- Barra de filtros -->
+<app-filters-bar (downloadReport)="onDownloadReport()" />
+
+<div class="overview">
+
+  <!-- ── KPIs ──────────────────────────────────────────── -->
+  <section class="kpi-grid">
+    <app-kpi-card
+      title="Total accidentes"
+      [value]="kpis().totalAccidents"
+      icon="AlertTriangle"
+      color="red"
+      [trend]="2.4"
+      subtitle="en el período seleccionado"
+    />
+    <app-kpi-card
+      title="Fatalidades"
+      [value]="kpis().totalFatalities"
+      icon="HeartPulse"
+      color="orange"
+      [trend]="1.1"
+      subtitle="1.18% del total"
+    />
+    <app-kpi-card
+      title="Promedio diario"
+      [value]="kpis().avgPerDay"
+      icon="CalendarClock"
+      color="blue"
+      [trend]="-3.2"
+      subtitle="accidentes por día"
+    />
+    <app-kpi-card
+      title="Estado crítico"
+      [value]="kpis().topState"
+      [icon]="'MapPin'"
+      color="green"
+      subtitle="{{ kpis().topStateCount | number }} accidentes"
+    />
+  </section>
+
+  <!-- ── Gráficas principales ──────────────────────────── -->
+  <section class="charts-row">
+
+    <!-- Tendencia mensual -->
+    <div class="chart-card chart-card--wide">
+      <div class="chart-card__header">
+        <div>
+          <h3>Tendencia mensual</h3>
+          <p>Distribución de accidentes y fatalidades por mes</p>
+        </div>
+        <div class="chart-card__badge">
+          <lucide-icon name="TrendingUp" [size]="14" />
+          12 meses
+        </div>
+      </div>
+      <div class="chart-canvas-wrapper">
+        <canvas baseChart
+          [data]="trendChartData()"
+          [options]="trendChartOptions"
+          type="line"
+        ></canvas>
+      </div>
+    </div>
+
+    <!-- Severidad donut -->
+    <div class="chart-card chart-card--narrow">
+      <div class="chart-card__header">
+        <div>
+          <h3>Por severidad</h3>
+          <p>Distribución del total</p>
+        </div>
+      </div>
+      <div class="chart-canvas-wrapper chart-canvas-wrapper--donut">
+        <canvas baseChart
+          [data]="severityChartData()"
+          [options]="severityChartOptions"
+          type="doughnut"
+        ></canvas>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ── Ranking de estados ─────────────────────────────── -->
+  <section class="ranking-card">
+    <div class="ranking-card__header">
+      <h3>Top estados por accidentalidad</h3>
+      <p>Porcentaje relativo al estado con más registros</p>
+    </div>
+
+    <div class="ranking-list">
+      <div
+        class="ranking-item"
+        *ngFor="let item of stateRanking(); let i = index"
+      >
+        <span class="ranking-item__pos"
+          [class.ranking-item__pos--top]="i < 3"
+        >{{ i + 1 }}</span>
+
+        <span class="ranking-item__name">{{ item.state }}</span>
+
+        <div class="ranking-item__bar-wrapper">
+          <div
+            class="ranking-item__bar"
+            [style.width.%]="item.pct"
+            [class.ranking-item__bar--top]="i === 0"
+          ></div>
+        </div>
+
+        <span class="ranking-item__value">
+          {{ item.accidents | number }}
+        </span>
+      </div>
+    </div>
+  </section>
+
+</div>
