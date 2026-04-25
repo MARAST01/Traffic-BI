@@ -1,0 +1,81 @@
+<div class="filters-bar">
+
+  <div class="filters-bar__left">
+    <!-- Ícono + título -->
+    <div class="filters-bar__title">
+      <lucide-icon name="SlidersHorizontal" [size]="16" />
+      <span>Filtros</span>
+      <span class="active-badge" *ngIf="hasActive()">
+        {{ activeCount() }}
+      </span>
+    </div>
+
+    <!-- Selects -->
+    <div class="filters-bar__selects">
+
+      <div class="filter-group">
+        <label>Año</label>
+        <select
+          [value]="filters().year"
+          (change)="update('year', $event)"
+          class="filter-select"
+        >
+          <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Estado</label>
+        <select
+          [value]="filters().state"
+          (change)="update('state', $event)"
+          class="filter-select"
+        >
+          <option *ngFor="let s of states" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Severidad</label>
+        <select
+          [value]="filters().severity"
+          (change)="update('severity', $event)"
+          class="filter-select"
+        >
+          <option *ngFor="let sv of severities" [value]="sv">{{ sv }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Clima</label>
+        <select
+          [value]="filters().weather"
+          (change)="update('weather', $event)"
+          class="filter-select"
+        >
+          <option *ngFor="let w of weathers" [value]="w">{{ w }}</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Acciones -->
+  <div class="filters-bar__actions">
+    <button
+      class="btn-reset"
+      *ngIf="hasActive()"
+      (click)="reset()"
+      title="Limpiar filtros"
+    >
+      <lucide-icon name="X" [size]="14" />
+      Limpiar
+    </button>
+
+    <button class="btn-download" (click)="onDownload()">
+      <lucide-icon name="Download" [size]="15" />
+      Exportar
+    </button>
+  </div>
+
+</div>

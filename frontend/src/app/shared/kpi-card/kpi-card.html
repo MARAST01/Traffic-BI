@@ -1,0 +1,35 @@
+<div class="kpi-card" [style.border-color]="colors().border">
+
+  <!-- Header: título + ícono -->
+  <div class="kpi-card__header">
+    <span class="kpi-card__title">{{ title() }}</span>
+    <div class="kpi-card__icon" [style.background]="colors().icon">
+      <lucide-icon [name]="icon()" [size]="18" [style.color]="colors().text" />
+    </div>
+  </div>
+
+  <!-- Valor principal -->
+  <div class="kpi-card__value" [style.color]="colors().text">
+    {{ formattedValue() }}
+  </div>
+
+  <!-- Subtítulo + tendencia -->
+  <div class="kpi-card__footer">
+    @if (subtitle()) {
+      <span class="kpi-card__subtitle">
+        {{ subtitle() }}
+      </span>
+    }
+
+    @if (trendLabel()) {
+      <span
+        class="kpi-card__trend"
+        [ngClass]="trendUp() ? 'trend--up' : 'trend--down'"
+      >
+        <lucide-icon [name]="trendUp() ? 'TrendingUp' : 'TrendingDown'" [size]="12" />
+        {{ trendLabel() }}
+      </span>
+    }
+  </div>
+
+</div>

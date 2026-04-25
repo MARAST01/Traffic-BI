@@ -1,0 +1,23 @@
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <app-sidebar [collapsed]="sidebarCollapsed()" />
+
+  <!-- Contenido principal -->
+  <div
+    class="main-area"
+    [class.main-area--collapsed]="sidebarCollapsed()"
+  >
+    <!-- Topbar -->
+    <app-topbar
+      [sidebarCollapsed]="sidebarCollapsed()"
+      (toggleSidebar)="toggleSidebar()"
+    />
+
+    <!-- Contenido de cada página -->
+    <main class="page-content scrollbar-thin">
+      <router-outlet />
+    </main>
+
+  </div>
+</div>

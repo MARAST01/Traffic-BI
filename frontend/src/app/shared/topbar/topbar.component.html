@@ -1,0 +1,49 @@
+<header class="topbar">
+
+  <!-- Izquierda: toggle + breadcrumb -->
+  <div class="topbar__left">
+
+    <!-- Botón colapsar sidebar -->
+    <button
+      class="topbar__toggle"
+      (click)="onToggle()"
+      [title]="sidebarCollapsed() ? 'Expandir menú' : 'Colapsar menú'"
+    >
+      <lucide-icon
+        [name]="sidebarCollapsed() ? 'PanelLeftOpen' : 'PanelLeftClose'"
+        [size]="18"
+      />
+    </button>
+
+    <!-- Separador vertical -->
+    <div class="topbar__sep"></div>
+
+    <!-- Breadcrumb -->
+    <div class="topbar__breadcrumb">
+      <lucide-icon [name]="currentPage().icon" [size]="16" class="topbar__breadcrumb-icon" />
+      <span class="topbar__breadcrumb-text">{{ currentPage().label }}</span>
+    </div>
+  </div>
+
+  <!-- Derecha: fecha + usuario -->
+  <div class="topbar__right">
+
+    <!-- Fecha actual -->
+    <p class="topbar__date">{{ today() }}</p>
+
+    <!-- Divisor -->
+    <div class="topbar__sep"></div>
+
+    <!-- Info usuario compacta -->
+    <div class="topbar__user">
+      <div class="topbar__user-text">
+        <span class="topbar__user-name">{{ user()?.name }}</span>
+        <span class="topbar__user-role">{{ user()?.role }}</span>
+      </div>
+      <div class="topbar__user-dot">
+        <lucide-icon name="User" [size]="15" />
+      </div>
+    </div>
+
+  </div>
+</header>
