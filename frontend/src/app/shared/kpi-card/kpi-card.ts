@@ -1,6 +1,6 @@
 import { Component, input, computed } from '@angular/core';
 import { LucideAngularModule, icons } from 'lucide-angular';
-import { NgClass } from '@angular/common';
+import { NgClass, NgIf } from '@angular/common';
 
 export type KpiColor = 'red' | 'orange' | 'blue' | 'green';
 

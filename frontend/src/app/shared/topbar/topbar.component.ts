@@ -25,7 +25,7 @@ const ROUTE_META: Record<string, Breadcrumb> = {
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [NgClass, LucideAngularModule],
+  imports: [LucideAngularModule],
   templateUrl: './topbar.component.html',
   styleUrl:    './topbar.component.scss',
 })

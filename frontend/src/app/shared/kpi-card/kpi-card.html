@@ -15,18 +15,21 @@
 
   <!-- Subtítulo + tendencia -->
   <div class="kpi-card__footer">
-    <span class="kpi-card__subtitle" *ngIf="subtitle()">
-      {{ subtitle() }}
-    </span>
+    @if (subtitle()) {
+      <span class="kpi-card__subtitle">
+        {{ subtitle() }}
+      </span>
+    }
 
-    <span
-      class="kpi-card__trend"
-      *ngIf="trendLabel()"
-      [ngClass]="trendUp() ? 'trend--up' : 'trend--down'"
-    >
-      <lucide-icon [name]="trendUp() ? 'TrendingUp' : 'TrendingDown'" [size]="12" />
-      {{ trendLabel() }}
-    </span>
+    @if (trendLabel()) {
+      <span
+        class="kpi-card__trend"
+        [ngClass]="trendUp() ? 'trend--up' : 'trend--down'"
+      >
+        <lucide-icon [name]="trendUp() ? 'TrendingUp' : 'TrendingDown'" [size]="12" />
+        {{ trendLabel() }}
+      </span>
+    }
   </div>
 
 </div>

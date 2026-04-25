@@ -25,7 +25,7 @@ Chart.register(
   selector: 'app-overview',
   standalone: true,
   imports: [
-    NgFor, NgIf, DecimalPipe,
+    NgFor, DecimalPipe,
     LucideAngularModule,
     BaseChartDirective,
     FiltersBarComponent,
@@ -102,7 +102,7 @@ export class OverviewComponent implements OnInit {
         cornerRadius: 8,
         callbacks: {
           label: ctx =>
-            ` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('es-CO')}`,
+            `${ctx.dataset.label}: ${ctx.parsed.y?.toLocaleString('es-CO') ?? ''}`,
         },
       },
     },
