@@ -1,0 +1,17 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: traffic-bi-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root_admin
+      MONGO_INITDB_DATABASE: traffic_bi
+    volumes:
+      - mongodb_data:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    command: ["--auth", "--bind_ip_all"]
+
+volumes:
+  mongodb_data:
