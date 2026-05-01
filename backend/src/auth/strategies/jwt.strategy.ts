@@ -1,0 +1,38 @@
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { ConfigService } from '@nestjs/config';
+import { UsersService } from '../../users/users.service';
+
+export interface JwtPayload {
+  sub: string; // userId
+  email: string;
+  role: string;
+}
+
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor(
+    private configService: ConfigService,
+    private usersService: UsersService,
+  ) {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKey: process.env.JWT_SECRET || 'fallback-secret',
+      ignoreExpiration: false,
+    });
+  }
+
+  async validate(payload: JwtPayload) {
+    const user = await this.usersService.findById(payload.sub);
+    if (!user || user.status === 'Inactivo') {
+      throw new UnauthorizedException('Usuario no autorizado');
+    }
+    return {
+      id: payload.sub,
+      email: payload.email,
+      role: payload.role,
+      name: user.name,
+    };
+  }
+}

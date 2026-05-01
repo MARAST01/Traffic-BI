@@ -1,0 +1,121 @@
+.topbar {
+  height: var(--topbar-height);
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  gap: 1rem;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+// ── Izquierda ────────────────────────────────────────────────
+.topbar__left {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.topbar__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  background: transparent;
+  border-radius: 0.5rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background-color 200ms, color 200ms;
+
+  &:hover {
+    background-color: var(--color-bg-app);
+    color: var(--color-text-primary);
+  }
+}
+
+.topbar__sep {
+  width: 1px;
+  height: 1.25rem;
+  background-color: var(--color-border);
+}
+
+.topbar__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.topbar__breadcrumb-icon {
+  color: var(--color-primary);
+}
+
+.topbar__breadcrumb-text {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+// ── Derecha ──────────────────────────────────────────────────
+.topbar__right {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.topbar__date {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-transform: capitalize;
+  margin: 0;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.topbar__user {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.topbar__user-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  @media (max-width: 640px) {
+    display: none;
+  }
+}
+
+.topbar__user-name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+
+.topbar__user-role {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  line-height: 1.2;
+}
+
+.topbar__user-dot {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--color-primary-light);
+}
