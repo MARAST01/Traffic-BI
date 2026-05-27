@@ -4,6 +4,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { UsersService } from './users/users.service';
+import { AccidentsModule } from './accidents/accidents.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { UsersService } from './users/users.service';
     }),
     AuthModule,
     UsersModule,
+    AccidentsModule,
+    AnalyticsModule,
   ],
 })
 export class AppModule implements OnModuleInit {
