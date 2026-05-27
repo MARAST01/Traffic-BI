@@ -1,1 +1,74 @@
-<p>temporal-analysis works!</p>
+<app-filters-bar (downloadReport)="onDownloadReport($event)" />
+
+<div class="temporal-dashboard">
+  <section class="hero-card">
+    <div>
+      <p class="eyebrow">Análisis temporal</p>
+      <h2>Patrones estacionales y horarios</h2>
+      <p class="summary">Monitorea la evolución mensual y los turnos con mayor concentración de eventos.</p>
+    </div>
+    <div class="hero-summary">
+      <div class="hero-chip">
+        <lucide-icon name="CalendarClock" [size]="14" />
+        <span>Mes pico: {{ peakMonth().label }}</span>
+      </div>
+      <div class="hero-chip hero-chip--accent">
+        <lucide-icon name="TrendingUp" [size]="14" />
+        <span>{{ peakMonth().accidents | number }} accidentes</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="dashboard-grid">
+    <article class="panel panel--wide">
+      <div class="panel__header">
+        <div>
+          <h3>Tendencia mensual</h3>
+          <p>Accidentes y fatalidades por mes</p>
+        </div>
+      </div>
+      <div class="chart-shell">
+        <canvas
+          baseChart
+          [data]="trendChartData()"
+          [options]="trendChartOptions"
+          type="line"
+        ></canvas>
+      </div>
+    </article>
+
+    <article class="panel">
+      <div class="panel__header">
+        <div>
+          <h3>Distribución por turno</h3>
+          <p>Volumen de accidentes por rango horario</p>
+        </div>
+      </div>
+      <div class="chart-shell chart-shell--small">
+        <canvas
+          baseChart
+          [data]="hourlyChartData()"
+          [options]="hourlyChartOptions"
+          type="bar"
+        ></canvas>
+      </div>
+    </article>
+  </section>
+
+  <section class="panel">
+    <div class="panel__header">
+      <div>
+        <h3>Resumen temporal</h3>
+        <p>Eventos para la ventana filtrada</p>
+      </div>
+    </div>
+
+    <div class="summary-grid">
+      <div class="summary-tile" *ngFor="let point of monthlyTrend().slice(0, 6)">
+        <span class="summary-tile__label">{{ point.label }}</span>
+        <strong class="summary-tile__value">{{ point.accidents | number }}</strong>
+        <p class="summary-tile__meta">{{ point.fatalities | number }} fatalidades</p>
+      </div>
+    </div>
+  </section>
+</div>

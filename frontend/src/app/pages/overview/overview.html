@@ -1,5 +1,5 @@
 <!-- Barra de filtros -->
-<app-filters-bar (downloadReport)="onDownloadReport()" />
+<app-filters-bar (downloadReport)="onDownloadReport($event)" />
 
 <div class="overview">
 
@@ -79,6 +79,38 @@
       </div>
     </div>
 
+  </section>
+
+  <!-- ── Mapa de calor regional ─────────────────────────── -->
+  <section class="heatmap-card">
+    <div class="heatmap-card__header">
+      <div>
+        <h3>Mapa de calor regional</h3>
+        <p>Concentración de accidentes por estado según filtros activos</p>
+      </div>
+      <div class="heatmap-card__legend">
+        <span class="legend-chip legend-chip--critical">Crítico</span>
+        <span class="legend-chip legend-chip--high">Alto</span>
+        <span class="legend-chip legend-chip--medium">Medio</span>
+        <span class="legend-chip legend-chip--low">Bajo</span>
+      </div>
+    </div>
+
+    <div class="heatmap-grid">
+      <article
+        class="heatmap-cell"
+        *ngFor="let cell of heatmapCells()"
+        [style.background]="cell.color"
+        [style.boxShadow]="'0 14px 34px -20px ' + cell.color"
+      >
+        <div class="heatmap-cell__top">
+          <span class="heatmap-cell__label">{{ cell.label }}</span>
+          <span class="heatmap-cell__level">{{ cell.level }}</span>
+        </div>
+        <strong class="heatmap-cell__value">{{ cell.accidents | number }}</strong>
+        <p class="heatmap-cell__detail">{{ cell.detail }}</p>
+      </article>
+    </div>
   </section>
 
   <!-- ── Ranking de estados ─────────────────────────────── -->

@@ -1,1 +1,57 @@
-<p>dynamic-tables works!</p>
+<app-filters-bar (downloadReport)="onDownloadReport($event)" />
+
+<div class="tables-dashboard">
+  <section class="hero-card">
+    <div>
+      <p class="eyebrow">Tablas dinámicas</p>
+      <h2>Listado analítico de incidentes</h2>
+      <p class="summary">Explora registros detallados, filtra por texto y ordena columnas para profundizar en el comportamiento de los eventos.</p>
+    </div>
+
+    <div class="toolbar">
+      <label class="search-box">
+        <lucide-icon name="SlidersHorizontal" [size]="15" />
+        <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar por estado, severidad o clima" />
+      </label>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel__header">
+      <div>
+        <h3>Registros de incidentes</h3>
+        <p>{{ filteredRows().length }} registros disponibles</p>
+      </div>
+      <span class="page-badge">Página {{ currentPage() }} de {{ totalPages() }}</span>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th (click)="sort('date')">Fecha <span class="sort-indicator">↕</span></th>
+            <th (click)="sort('area')">Área <span class="sort-indicator">↕</span></th>
+            <th (click)="sort('severity')">Severidad <span class="sort-indicator">↕</span></th>
+            <th (click)="sort('weather')">Clima <span class="sort-indicator">↕</span></th>
+            <th (click)="sort('accidents')">Accidentes <span class="sort-indicator">↕</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of paginatedRows()">
+            <td>{{ row.date }}</td>
+            <td>{{ row.area }}</td>
+            <td><span class="severity-pill" [ngClass]="'severity-pill--' + row.severity.toLowerCase()">{{ row.severity }}</span></td>
+            <td>{{ row.weather }}</td>
+            <td>{{ row.accidents | number }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <button class="page-button" (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 1">Anterior</button>
+      <span class="page-status">{{ currentPage() }} / {{ totalPages() }}</span>
+      <button class="page-button" (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() === totalPages()">Siguiente</button>
+    </div>
+  </section>
+</div>
