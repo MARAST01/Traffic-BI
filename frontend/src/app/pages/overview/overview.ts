@@ -175,8 +175,10 @@ export class OverviewComponent implements OnInit {
     this.dataService.getStateRanking(this.filters()).slice(0, 6),
   );
 
-  onDownloadReport() {
-    console.log('Generando reporte con filtros:', this.filters());
+  heatmapCells = computed(() => this.dataService.getHeatmapCells(this.filters()));
+
+  onDownloadReport(format: 'pdf' | 'xlsx') {
+    console.log('Generando reporte', format, 'con filtros:', this.filters());
     // Aquí se conectará al endpoint de reportes del backend
   }
 

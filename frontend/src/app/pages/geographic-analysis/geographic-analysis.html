@@ -1,1 +1,89 @@
-<p>geographic-analysis works!</p>
+<app-filters-bar (downloadReport)="onDownloadReport($event)" />
+
+<div class="geo-dashboard">
+  <section class="hero-card">
+    <div>
+      <p class="eyebrow">Mapa de calor</p>
+      <h2>Concentración geográfica de accidentes</h2>
+      <p class="summary">Visualiza hotspots por estado, severidad y clima para detectar zonas críticas y patrones espaciales.</p>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat__label">Hotspots críticos</span>
+        <strong class="hero-stat__value">{{ heatmapCells().filter(cell => cell.level === 'Crítico' || cell.level === 'Alto').length }}</strong>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat__label">Área dominante</span>
+        <strong class="hero-stat__value">{{ hotspots()[0]?.state ?? 'N/A' }}</strong>
+      </div>
+    </div>
+  </section>
+
+  <section class="dashboard-grid">
+    <article class="panel panel--wide">
+      <div class="panel__header">
+        <div>
+          <h3>Calor regional</h3>
+          <p>Intensidad de accidentes por estado</p>
+        </div>
+        <div class="legend">
+          <span class="legend-chip legend-chip--critical">Crítico</span>
+          <span class="legend-chip legend-chip--high">Alto</span>
+          <span class="legend-chip legend-chip--medium">Medio</span>
+          <span class="legend-chip legend-chip--low">Bajo</span>
+        </div>
+      </div>
+
+      <div class="heatmap-grid">
+        <article
+          class="heat-cell"
+          *ngFor="let cell of heatmapCells()"
+          [style.background]="cell.color"
+        >
+          <div class="heat-cell__header">
+            <span class="heat-cell__label">{{ cell.label }}</span>
+            <span class="heat-cell__level">{{ cell.level }}</span>
+          </div>
+          <strong class="heat-cell__value">{{ cell.accidents | number }}</strong>
+          <p class="heat-cell__detail">{{ cell.detail }}</p>
+        </article>
+      </div>
+    </article>
+
+    <article class="panel panel--right">
+      <div class="panel__header">
+        <div>
+          <h3>Top hotspots</h3>
+          <p>Volumen de accidentes por región</p>
+        </div>
+      </div>
+
+      <div class="chart-shell">
+        <canvas
+          baseChart
+          [data]="hotspotChartData()"
+          [options]="hotspotChartOptions"
+          type="bar"
+        ></canvas>
+      </div>
+    </article>
+  </section>
+
+  <section class="panel">
+    <div class="panel__header">
+      <div>
+        <h3>Detalle de concentración</h3>
+        <p>Ranking de zonas con mayor carga de eventos</p>
+      </div>
+    </div>
+
+    <div class="hotspot-list">
+      <div class="hotspot-row" *ngFor="let item of hotspots(); let index = index">
+        <div class="hotspot-row__rank">{{ index + 1 }}</div>
+        <div class="hotspot-row__name">{{ item.state }}</div>
+        <div class="hotspot-row__bar"><div class="hotspot-row__fill" [style.width.%]="item.pct"></div></div>
+        <div class="hotspot-row__value">{{ item.accidents | number }}</div>
+      </div>
+    </div>
+  </section>
+</div>

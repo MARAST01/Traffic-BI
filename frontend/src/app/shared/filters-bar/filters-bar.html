@@ -25,6 +25,17 @@
       </div>
 
       <div class="filter-group">
+        <label>Mes</label>
+        <select
+          [value]="filters().month"
+          (change)="update('month', $event)"
+          class="filter-select"
+        >
+          <option *ngFor="let month of months" [value]="month">{{ month }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
         <label>Estado</label>
         <select
           [value]="filters().state"
@@ -72,9 +83,14 @@
       Limpiar
     </button>
 
-    <button class="btn-download" (click)="onDownload()">
+    <button class="btn-download btn-download--secondary" (click)="onDownload('pdf')">
       <lucide-icon name="Download" [size]="15" />
-      Exportar
+      PDF
+    </button>
+
+    <button class="btn-download" (click)="onDownload('xlsx')">
+      <lucide-icon name="Download" [size]="15" />
+      Excel
     </button>
   </div>
 

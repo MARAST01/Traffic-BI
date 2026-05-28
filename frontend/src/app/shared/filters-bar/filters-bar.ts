@@ -5,6 +5,7 @@ import {
   FiltersService,
   AccidentFilters,
   YEARS,
+  MONTHS,
   STATES,
   SEVERITIES,
   WEATHERS,
@@ -18,7 +19,7 @@ import {
   styleUrl: './filters-bar.scss',
 })
 export class FiltersBarComponent {
-  downloadReport = output<void>();
+  downloadReport = output<'pdf' | 'xlsx'>();
 
   private filtersService = inject(FiltersService);
 
@@ -27,6 +28,7 @@ export class FiltersBarComponent {
   hasActive = this.filtersService.hasActiveFilters;
 
   years = YEARS;
+  months = MONTHS;
   states = STATES;
   severities = SEVERITIES;
   weathers = WEATHERS;
@@ -40,7 +42,7 @@ export class FiltersBarComponent {
     this.filtersService.reset();
   }
 
-  onDownload() {
-    this.downloadReport.emit();
+  onDownload(format: 'pdf' | 'xlsx') {
+    this.downloadReport.emit(format);
   }
 }

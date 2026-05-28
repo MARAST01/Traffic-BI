@@ -2,6 +2,7 @@ import { Injectable, signal, computed } from '@angular/core';
 
 export interface AccidentFilters {
   year:     string;
+  month:    string;
   state:    string;
   severity: string;
   weather:  string;
@@ -9,12 +10,14 @@ export interface AccidentFilters {
 
 const DEFAULT_FILTERS: AccidentFilters = {
   year:     'Todos',
+  month:    'Todos',
   state:    'Todos',
   severity: 'Todos',
   weather:  'Todos',
 };
 
 export const YEARS     = ['Todos', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'];
+export const MONTHS    = ['Todos', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 export const STATES    = ['Todos', 'California', 'Texas', 'Florida', 'New York', 'Pennsylvania',
                           'Ohio', 'Illinois', 'Georgia', 'North Carolina', 'Michigan',
                           'New Jersey', 'Virginia', 'Washington', 'Arizona', 'Tennessee',

@@ -1,1 +1,68 @@
-<p>associated-factors works!</p>
+<app-filters-bar (downloadReport)="onDownloadReport($event)" />
+
+<div class="factors-dashboard">
+  <section class="hero-card">
+    <div>
+      <p class="eyebrow">Factores asociados</p>
+      <h2>Relación entre severidad, clima y concentración</h2>
+      <p class="summary">Identifica las condiciones que amplifican los riesgos y explora la mezcla de factores sobre el volumen accidental.</p>
+    </div>
+  </section>
+
+  <section class="dashboard-grid">
+    <article class="panel">
+      <div class="panel__header">
+        <div>
+          <h3>Severidad</h3>
+          <p>Distribución del nivel de impacto del incidente</p>
+        </div>
+      </div>
+      <div class="chart-shell">
+        <canvas
+          baseChart
+          [data]="severityChartData()"
+          [options]="severityOptions"
+          type="doughnut"
+        ></canvas>
+      </div>
+    </article>
+
+    <article class="panel">
+      <div class="panel__header">
+        <div>
+          <h3>Clima</h3>
+          <p>Concentración por tipo de condición meteorológica</p>
+        </div>
+      </div>
+      <div class="chart-shell chart-shell--bar">
+        <canvas
+          baseChart
+          [data]="weatherChartData()"
+          [options]="weatherOptions"
+          type="bar"
+        ></canvas>
+      </div>
+    </article>
+  </section>
+
+  <section class="panel">
+    <div class="panel__header">
+      <div>
+        <h3>Top factores asociados</h3>
+        <p>Escala de impacto por condición operativa</p>
+      </div>
+    </div>
+
+    <div class="factor-list">
+      <div class="factor-row" *ngFor="let item of factorRows()">
+        <div class="factor-row__meta">
+          <span class="factor-row__label">{{ item.label }}</span>
+          <span class="factor-row__value">{{ item.value | number }}</span>
+        </div>
+        <div class="factor-row__bar">
+          <div class="factor-row__fill" [style.width.%]="item.percent" [style.background]="item.color"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
