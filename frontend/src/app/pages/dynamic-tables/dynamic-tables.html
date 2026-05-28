@@ -20,7 +20,7 @@
     <div class="panel__header">
       <div>
         <h3>Registros de incidentes</h3>
-        <p>{{ filteredRows().length }} registros disponibles</p>
+        <p>{{ tableTotal() | number }} registros en total</p>
       </div>
       <span class="page-badge">Página {{ currentPage() }} de {{ totalPages() }}</span>
     </div>

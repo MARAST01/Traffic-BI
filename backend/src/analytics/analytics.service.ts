@@ -89,42 +89,94 @@ export class AnalyticsService {
     return { min: minDoc[0]?.start_time, max: maxDoc[0]?.start_time };
   }
 
+  private daysInRange(filters: AnalyticsFilterDto): number {
+    if (!filters.startDate && !filters.endDate) return 365;
+    const start = filters.startDate
+      ? new Date(filters.startDate)
+      : new Date('2016-01-01');
+    const end = filters.endDate ? new Date(filters.endDate) : new Date();
+    const diff = Math.max(
+      1,
+      Math.ceil((end.getTime() - start.getTime()) / 86_400_000),
+    );
+    return diff;
+  }
+
   async getKpis(filters: AnalyticsFilterDto) {
     const match = await this.buildMatchQuery(filters);
 
-    const basicStats = await this.factModel.aggregate([
-      { $match: match },
-      {
-        $group: {
-          _id: null,
-          total: { $sum: 1 },
-          avgSev: { $avg: '$severity' },
-        },
-      },
-    ]);
+    const [basicStats, weatherStats, fatalStats, topStateStats] =
+      await Promise.all([
+        this.factModel.aggregate([
+          { $match: match },
+          {
+            $group: {
+              _id: null,
+              total: { $sum: 1 },
+              avgSev: { $avg: '$severity' },
+            },
+          },
+        ]),
+        this.factModel.aggregate([
+          { $match: match },
+          { $group: { _id: '$weather_key', count: { $sum: 1 } } },
+          { $sort: { count: -1 } },
+          { $limit: 1 },
+          {
+            $lookup: {
+              from: 'weather_dim',
+              localField: '_id',
+              foreignField: '_id',
+              as: 'weather',
+            },
+          },
+          { $unwind: '$weather' },
+        ]),
+        this.factModel.aggregate([
+          { $match: { ...match, severity: 4 } },
+          { $count: 'fatalities' },
+        ]),
+        this.factModel.aggregate([
+          { $match: match },
+          {
+            $lookup: {
+              from: 'location_dim',
+              localField: 'location_key',
+              foreignField: '_id',
+              as: 'loc',
+            },
+          },
+          { $unwind: '$loc' },
+          { $group: { _id: '$loc.state', count: { $sum: 1 } } },
+          { $sort: { count: -1 } },
+          { $limit: 1 },
+        ]),
+      ]);
 
-    const weatherStats = await this.factModel.aggregate([
-      { $match: match },
-      { $group: { _id: '$weather_key', count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-      { $limit: 1 },
-      {
-        $lookup: {
-          from: 'weather_dim',
-          localField: '_id',
-          foreignField: '_id',
-          as: 'weather',
-        },
-      },
-      { $unwind: '$weather' },
-    ]);
+    const total = basicStats[0]?.total || 0;
+    const days = this.daysInRange(filters);
+    const fatalities = fatalStats[0]?.fatalities ?? 0;
+    const topState = topStateStats[0]?._id ?? 'N/A';
 
     return {
-      totalAccidents: basicStats[0]?.total || 0,
+      totalAccidents: total,
+      totalFatalities: fatalities,
+      avgPerDay: Number((total / days).toFixed(1)),
+      topState: this.formatStateLabel(topState),
+      topStateCount: topStateStats[0]?.count ?? 0,
       averageSeverity: Number((basicStats[0]?.avgSev || 0).toFixed(2)),
-      affectedDistanceMi: 0, // ⚠️ Columna omitida en el ETL
-      mostFrequentCondition: weatherStats[0]?.weather?.weather_type || 'N/A',
+      affectedDistanceMi: 0,
+      mostFrequentCondition:
+        weatherStats[0]?.weather?.weather_type || 'N/A',
     };
+  }
+
+  private formatStateLabel(state: string): string {
+    if (!state || state === 'N/A') return 'N/A';
+    return state
+      .split(' ')
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
   }
 
   async getTrend(filters: AnalyticsFilterDto) {
@@ -184,6 +236,64 @@ export class AnalyticsService {
       { $group: { _id: { $hour: '$start_time' }, count: { $sum: 1 } } },
       { $sort: { _id: 1 } },
       { $project: { _id: 0, hour: '$_id', count: '$count' } },
+    ]);
+  }
+
+  async getStateRanking(filters: AnalyticsFilterDto, limit = 15) {
+    const match = await this.buildMatchQuery(filters);
+    const rows = await this.factModel.aggregate([
+      { $match: match },
+      {
+        $lookup: {
+          from: 'location_dim',
+          localField: 'location_key',
+          foreignField: '_id',
+          as: 'loc',
+        },
+      },
+      { $unwind: '$loc' },
+      { $group: { _id: '$loc.state', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: limit },
+      {
+        $project: {
+          _id: 0,
+          state: '$_id',
+          accidents: '$count',
+        },
+      },
+    ]);
+
+    const max = rows[0]?.accidents ?? 1;
+    return rows.map((r) => ({
+      state: this.formatStateLabel(r.state),
+      accidents: r.accidents,
+      pct: Math.round((r.accidents / max) * 100),
+    }));
+  }
+
+  async getWeatherDistribution(filters: AnalyticsFilterDto) {
+    const match = await this.buildMatchQuery(filters);
+    return this.factModel.aggregate([
+      { $match: match },
+      {
+        $lookup: {
+          from: 'weather_dim',
+          localField: 'weather_key',
+          foreignField: '_id',
+          as: 'wth',
+        },
+      },
+      { $unwind: '$wth' },
+      { $group: { _id: '$wth.weather_type', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      {
+        $project: {
+          _id: 0,
+          weather: '$_id',
+          count: '$count',
+        },
+      },
     ]);
   }
 

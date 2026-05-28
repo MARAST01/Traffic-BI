@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { AccidentsService } from './accidents.service';
 import { AnalyticsFilterDto } from '../analytics/dto/analytics-filter.dto';
+import { ExportAccidentsDto } from './dto/export-accidents.dto';
 import type { Response } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -29,10 +30,10 @@ export class AccidentsController {
 
   @Post('export')
   async exportAccidents(
-    @Body() filters: AnalyticsFilterDto,
-    @Body('format') format: 'xlsx' | 'pdf',
+    @Body() body: ExportAccidentsDto,
     @Res() res: Response,
   ) {
+    const { format, ...filters } = body;
     return this.accidentsService.exportData(filters, format, res);
   }
 }

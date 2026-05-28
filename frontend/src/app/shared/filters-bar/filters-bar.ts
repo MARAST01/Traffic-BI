@@ -4,11 +4,8 @@ import { LucideAngularModule } from 'lucide-angular';
 import {
   FiltersService,
   AccidentFilters,
-  YEARS,
   MONTHS,
-  STATES,
   SEVERITIES,
-  WEATHERS,
 } from '../../core/services/filters.service';
 
 @Component({
@@ -27,11 +24,11 @@ export class FiltersBarComponent {
   activeCount = this.filtersService.activeCount;
   hasActive = this.filtersService.hasActiveFilters;
 
-  years = YEARS;
+  years = this.filtersService.years;
   months = MONTHS;
-  states = STATES;
+  states = this.filtersService.states;
   severities = SEVERITIES;
-  weathers = WEATHERS;
+  weathers = this.filtersService.weathers;
 
   update(key: keyof AccidentFilters, event: Event) {
     const val = (event.target as HTMLSelectElement).value;

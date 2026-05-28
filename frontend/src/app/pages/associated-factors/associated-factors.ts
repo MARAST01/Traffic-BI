@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { BaseChartDirective } from 'ng2-charts';
@@ -6,7 +6,7 @@ import { Chart, CategoryScale, LinearScale, ArcElement, Tooltip, Legend, BarElem
 import { ChartConfiguration, ChartData } from 'chart.js';
 
 import { FiltersService } from '../../core/services/filters.service';
-import { MockDataService } from '../../core/services/mock-data.service';
+import { DashboardService } from '../../core/services/dashboard.service';
 import { FiltersBarComponent } from '../../shared/filters-bar/filters-bar';
 
 Chart.register(CategoryScale, LinearScale, ArcElement, BarElement, Tooltip, Legend);
@@ -18,13 +18,16 @@ Chart.register(CategoryScale, LinearScale, ArcElement, BarElement, Tooltip, Lege
   templateUrl: './associated-factors.html',
   styleUrl: './associated-factors.scss',
 })
-export class AssociatedFactors {
+export class AssociatedFactors implements OnInit, OnDestroy {
   private filtersService = inject(FiltersService);
-  private dataService = inject(MockDataService);
+  private dashboard = inject(DashboardService);
 
   filters = this.filtersService.filters;
-  severityDistribution = computed(() => this.dataService.getSeverityDistribution(this.filters()));
-  weatherDistribution = computed(() => this.dataService.getWeatherDistribution(this.filters()));
+  loading = this.dashboard.loading;
+  error = this.dashboard.error;
+
+  severityDistribution = this.dashboard.severityDistribution;
+  weatherDistribution = this.dashboard.weatherDistribution;
 
   severityChartData = computed<ChartData<'doughnut'>>(() => ({
     labels: this.severityDistribution().map(item => item.label),
@@ -73,14 +76,21 @@ export class AssociatedFactors {
   factorRows = computed(() => {
     const factors = this.topFactors();
     const maxValue = factors[0]?.value ?? 1;
-
     return factors.map(item => ({
       ...item,
       percent: Math.max((item.value / maxValue) * 100, 0),
     }));
   });
 
+  ngOnInit(): void {
+    this.dashboard.connect('factors');
+  }
+
+  ngOnDestroy(): void {
+    this.dashboard.disconnect();
+  }
+
   onDownloadReport(format: 'pdf' | 'xlsx') {
-    console.log('Factors export', format, this.filters());
+    this.dashboard.exportReport(format);
   }
 }

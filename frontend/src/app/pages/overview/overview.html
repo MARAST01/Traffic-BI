@@ -1,6 +1,13 @@
 <!-- Barra de filtros -->
 <app-filters-bar (downloadReport)="onDownloadReport($event)" />
 
+@if (loading()) {
+  <p class="dashboard-status">Cargando datos…</p>
+}
+@if (error()) {
+  <p class="dashboard-status dashboard-status--error">{{ error() }}</p>
+}
+
 <div class="overview">
 
   <!-- ── KPIs ──────────────────────────────────────────── -->
@@ -10,23 +17,20 @@
       [value]="kpis().totalAccidents"
       icon="TriangleAlert"
       color="red"
-      [trend]="2.4"
       subtitle="en el período seleccionado"
     />
     <app-kpi-card
-      title="Fatalidades"
+      title="Fatalidades (sev. 4)"
       [value]="kpis().totalFatalities"
       icon="HeartPulse"
       color="orange"
-      [trend]="1.1"
-      subtitle="1.18% del total"
+      subtitle="accidentes de máxima severidad"
     />
     <app-kpi-card
       title="Promedio diario"
       [value]="kpis().avgPerDay"
       icon="CalendarClock"
       color="blue"
-      [trend]="-3.2"
       subtitle="accidentes por día"
     />
     <app-kpi-card

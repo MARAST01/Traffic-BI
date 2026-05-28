@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { BaseChartDirective } from 'ng2-charts';
@@ -14,7 +14,7 @@ import {
 
 import { FiltersBarComponent } from '../../shared/filters-bar/filters-bar';
 import { FiltersService } from '../../core/services/filters.service';
-import { MockDataService } from '../../core/services/mock-data.service';
+import { DashboardService } from '../../core/services/dashboard.service';
 
 Chart.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
@@ -25,13 +25,15 @@ Chart.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
   templateUrl: './geographic-analysis.html',
   styleUrl: './geographic-analysis.scss',
 })
-export class GeographicAnalysis {
+export class GeographicAnalysis implements OnInit, OnDestroy {
   private filtersService = inject(FiltersService);
-  private dataService = inject(MockDataService);
+  private dashboard = inject(DashboardService);
 
   filters = this.filtersService.filters;
-  heatmapCells = computed(() => this.dataService.getHeatmapCells(this.filters()));
-  hotspots = computed(() => this.dataService.getStateRanking(this.filters()).slice(0, 6));
+  loading = this.dashboard.loading;
+  error = this.dashboard.error;
+  heatmapCells = this.dashboard.heatmapCells;
+  hotspots = computed(() => this.dashboard.stateRanking().slice(0, 6));
 
   hotspotChartData = computed<ChartData<'bar'>>(() => {
     const data = this.hotspots();
@@ -72,7 +74,15 @@ export class GeographicAnalysis {
     },
   };
 
+  ngOnInit(): void {
+    this.dashboard.connect('geographic');
+  }
+
+  ngOnDestroy(): void {
+    this.dashboard.disconnect();
+  }
+
   onDownloadReport(format: 'pdf' | 'xlsx') {
-    console.log('Geographic export', format, this.filters());
+    this.dashboard.exportReport(format);
   }
 }

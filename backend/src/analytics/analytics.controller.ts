@@ -52,4 +52,14 @@ export class AnalyticsController {
   async getHeatmap(@Query() filters: AnalyticsFilterDto) {
     return this.analyticsService.getHeatmap(filters);
   }
+
+  @Get('charts/state-ranking')
+  async getStateRanking(@Query() filters: AnalyticsFilterDto) {
+    return this.analyticsService.getStateRanking(filters);
+  }
+
+  @Get('charts/weather-distribution')
+  async getWeatherDistribution(@Query() filters: AnalyticsFilterDto) {
+    return this.analyticsService.getWeatherDistribution(filters);
+  }
 }

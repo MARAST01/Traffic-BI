@@ -13,7 +13,7 @@ docker compose -f mongodb/docker-compose.yml up -d
 
 Crea esquema e índices:
 
-mongosh "mongodb://root_admin:TU_PASSWORD@localhost:27017/admin" mongodb/create_schema_indexes.js
+mongosh "mongodb://root_admin:1234@localhost:27017/admin" mongodb/create_schema_indexes.js
 
 Instala dependencias ETL:
 

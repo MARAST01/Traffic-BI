@@ -2,7 +2,6 @@ db = db.getSiblingDB("traffic_bi");
 
 db.createUser({
   user: "traffic_bi_app",
-  pwd: "admin123",
   roles: [
     {
       role: "readWrite",

@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { BaseChartDirective } from 'ng2-charts';
@@ -6,7 +6,7 @@ import { ChartConfiguration, ChartData } from 'chart.js';
 import { Chart, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Tooltip, Legend } from 'chart.js';
 
 import { FiltersService } from '../../core/services/filters.service';
-import { MockDataService } from '../../core/services/mock-data.service';
+import { DashboardService } from '../../core/services/dashboard.service';
 import { FiltersBarComponent } from '../../shared/filters-bar/filters-bar';
 
 Chart.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Tooltip, Legend);
@@ -18,14 +18,16 @@ Chart.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement
   templateUrl: './temporal-analysis.html',
   styleUrl: './temporal-analysis.scss',
 })
-export class TemporalAnalysis {
+export class TemporalAnalysis implements OnInit, OnDestroy {
   private filtersService = inject(FiltersService);
-  private dataService = inject(MockDataService);
+  private dashboard = inject(DashboardService);
 
   filters = this.filtersService.filters;
+  loading = this.dashboard.loading;
+  error = this.dashboard.error;
 
-  monthlyTrend = computed(() => this.dataService.getMonthlyTrend(this.filters()));
-  hourlyTrend = computed(() => this.dataService.getHourlyTrend(this.filters()));
+  monthlyTrend = this.dashboard.monthlyTrend;
+  hourlyTrend = this.dashboard.hourlyTrend;
 
   trendChartData = computed<ChartData<'line'>>(() => {
     const data = this.monthlyTrend();
@@ -42,7 +44,7 @@ export class TemporalAnalysis {
           pointBackgroundColor: '#2563eb',
         },
         {
-          label: 'Fatalidades',
+          label: 'Graves (est.)',
           data: data.map(point => point.fatalities),
           borderColor: '#f97316',
           backgroundColor: 'rgba(249, 115, 22, 0.16)',
@@ -105,10 +107,19 @@ export class TemporalAnalysis {
 
   peakMonth = computed(() => {
     const data = this.monthlyTrend();
+    if (!data.length) return { label: '—', accidents: 0 };
     return data.reduce((max, point) => point.accidents > max.accidents ? point : max, data[0]);
   });
 
+  ngOnInit(): void {
+    this.dashboard.connect('temporal');
+  }
+
+  ngOnDestroy(): void {
+    this.dashboard.disconnect();
+  }
+
   onDownloadReport(format: 'pdf' | 'xlsx') {
-    console.log('Temporal export', format, this.filters());
+    this.dashboard.exportReport(format);
   }
 }
