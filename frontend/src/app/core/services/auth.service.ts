@@ -1,12 +1,15 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap, catchError, throwError } from 'rxjs';
 import { User, AuthResponse, LoginCredentials, ROLE_PERMISSIONS } from '../models/user.model';
+import { environment } from '../../../environments/environment';
+import { FiltersService } from './filters.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly API = 'http://localhost:3000/api';
+  private readonly API = environment.apiUrl;
+  private readonly filtersService = inject(FiltersService);
   private readonly TOKEN_KEY = 'traffic_bi_token';
 
   // Signals reactivos (Angular 17+)
@@ -35,6 +38,7 @@ export class AuthService {
         localStorage.setItem(this.TOKEN_KEY, response.accessToken);
         this._user.set(response.user);
         this._loading.set(false);
+        this.filtersService.loadFilterOptions();
       }),
       catchError(err => {
         this._loading.set(false);
@@ -65,7 +69,10 @@ export class AuthService {
 
     // Verificar token con el backend
     this.http.get<User>(`${this.API}/auth/me`).subscribe({
-      next: user => this._user.set(user),
+      next: user => {
+        this._user.set(user);
+        this.filtersService.loadFilterOptions();
+      },
       error: () => this.logout(),
     });
   }

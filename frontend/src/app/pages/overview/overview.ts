@@ -1,5 +1,5 @@
-import { Component, inject, computed, OnInit } from '@angular/core';
-import { NgFor, NgIf, DecimalPipe } from '@angular/common';
+import { Component, inject, computed, OnInit, OnDestroy } from '@angular/core';
+import { NgFor, DecimalPipe } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData } from 'chart.js';
@@ -10,11 +10,10 @@ import {
 } from 'chart.js';
 
 import { FiltersService } from '../../core/services/filters.service';
-import { MockDataService } from '../../core/services/mock-data.service';
+import { DashboardService } from '../../core/services/dashboard.service';
 import { FiltersBarComponent } from '../../shared/filters-bar/filters-bar';
 import { KpiCardComponent } from '../../shared/kpi-card/kpi-card';
 
-// Registrar módulos de Chart.js
 Chart.register(
   CategoryScale, LinearScale, PointElement,
   LineElement, BarElement, ArcElement, Filler,
@@ -34,18 +33,19 @@ Chart.register(
   templateUrl: './overview.html',
   styleUrl:    './overview.scss',
 })
-export class OverviewComponent implements OnInit {
+export class OverviewComponent implements OnInit, OnDestroy {
   private filtersService = inject(FiltersService);
-  private dataService    = inject(MockDataService);
+  private dashboard      = inject(DashboardService);
 
   filters = this.filtersService.filters;
+  loading = this.dashboard.loading;
+  error   = this.dashboard.error;
 
-  // ── KPIs ──────────────────────────────────────────────────
-  kpis = computed(() => this.dataService.getKPIs(this.filters()));
+  kpis = this.dashboard.kpis;
+  heatmapCells = this.dashboard.heatmapCells;
 
-  // ── Gráfica de tendencia (línea + área) ───────────────────
   trendChartData = computed<ChartData<'line'>>(() => {
-    const data = this.dataService.getMonthlyTrend(this.filters());
+    const data = this.dashboard.monthlyTrend();
     return {
       labels: data.map(d => d.label),
       datasets: [
@@ -62,7 +62,7 @@ export class OverviewComponent implements OnInit {
           fill:            true,
         },
         {
-          label:           'Fatalidades',
+          label:           'Graves (est.)',
           data:            data.map(d => d.fatalities),
           borderColor:     '#dc2626',
           backgroundColor: 'rgba(220, 38, 38, 0.06)',
@@ -124,9 +124,8 @@ export class OverviewComponent implements OnInit {
     },
   };
 
-  // ── Gráfica de severidad (donut) ──────────────────────────
   severityChartData = computed<ChartData<'doughnut'>>(() => {
-    const data = this.dataService.getSeverityDistribution(this.filters());
+    const data = this.dashboard.severityDistribution();
     return {
       labels:   data.map(d => d.label),
       datasets: [{
@@ -170,17 +169,19 @@ export class OverviewComponent implements OnInit {
     },
   };
 
-  // ── Ranking de estados ────────────────────────────────────
   stateRanking = computed(() =>
-    this.dataService.getStateRanking(this.filters()).slice(0, 6),
+    this.dashboard.stateRanking().slice(0, 6),
   );
 
-  heatmapCells = computed(() => this.dataService.getHeatmapCells(this.filters()));
-
-  onDownloadReport(format: 'pdf' | 'xlsx') {
-    console.log('Generando reporte', format, 'con filtros:', this.filters());
-    // Aquí se conectará al endpoint de reportes del backend
+  ngOnInit(): void {
+    this.dashboard.connect('overview');
   }
 
-  ngOnInit() {}
+  ngOnDestroy(): void {
+    this.dashboard.disconnect();
+  }
+
+  onDownloadReport(format: 'pdf' | 'xlsx') {
+    this.dashboard.exportReport(format);
+  }
 }
