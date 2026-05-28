@@ -5,6 +5,13 @@ from datetime import datetime
 import pandas as pd
 from pymongo import MongoClient, UpdateOne
 
+def execute_in_batches(collection, ops, batch_size=100):
+    for i in range(0, len(ops), batch_size):
+        batch = ops[i:i + batch_size]
+        collection.bulk_write(batch, ordered=False)
+        
+
+
 
 def normalize_text(value):
     if pd.isna(value):
@@ -26,8 +33,9 @@ def safe_bool(value):
 
 
 def extract_intensity(text):
-    if text is None:
+    if pd.isna(text):
         return None
+    text = str(text).lower()
     if "light" in text:
         return "light"
     if "heavy" in text:
@@ -36,8 +44,9 @@ def extract_intensity(text):
 
 
 def unify_terms(text):
-    if text is None:
+    if pd.isna(text):
         return None
+    text = str(text).lower()
     text = text.replace("t-storm", "thunderstorm")
     text = text.replace("tstorm", "thunderstorm")
     text = text.replace("showers", "shower")
@@ -47,7 +56,10 @@ def unify_terms(text):
 
 
 def categorize_weather(text):
-    if text is None or text == "":
+    if pd.isna(text):
+        return None
+    text = str(text).lower()
+    if text == "":
         return None
     if "snow" in text:
         return "snow"
@@ -291,11 +303,11 @@ def load_data(args):
             fact_ops.append(UpdateOne({"accident_id": row.ID}, {"$set": fact_doc}, upsert=True))
 
         if date_ops:
-            date_dim.bulk_write(date_ops, ordered=False)
-            location_dim.bulk_write(location_ops, ordered=False)
-            weather_dim.bulk_write(weather_ops, ordered=False)
-            infrastructure_dim.bulk_write(infra_ops, ordered=False)
-            fact.bulk_write(fact_ops, ordered=False)
+            execute_in_batches(date_dim, date_ops)
+            execute_in_batches(location_dim, location_ops)
+            execute_in_batches(weather_dim, weather_ops)
+            execute_in_batches(infrastructure_dim, infra_ops)
+            execute_in_batches(fact, fact_ops)
 
         total_loaded += len(fact_ops)
         print(f"Chunk {chunk_number} cargado. Filas fact: {len(fact_ops)}. Total acumulado: {total_loaded}")
@@ -305,7 +317,7 @@ def load_data(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Carga ETL a MongoDB con modelo multidimensional.")
-    parser.add_argument("--mongo-uri", default="mongodb://root_admin:1234@localhost:27017/traffic_bi?authSource=admin")
+    parser.add_argument("--mongo-uri", default="mongodb://traffic_bi_app:admin123@localhost:27017/traffic_bi?authSource=traffic_bi")
     parser.add_argument("--db-name", default="traffic_bi")
     parser.add_argument("--csv-path", default="ETL/US_Accidents_March23.csv")
     parser.add_argument("--chunk-size", type=int, default=50000)

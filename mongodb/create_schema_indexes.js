@@ -58,5 +58,10 @@ database.accidents_fact.createIndex(
   { date_key: 1, location_key: 1, severity: 1, weather_key: 1 },
   { name: "ix_fact_main_analytics" }
 );
+database.accidents_fact.createIndex({ start_time: 1 }, { name: "ix_fact_start_time" });
+database.accidents_fact.createIndex(
+  { start_time: -1, location_key: 1, severity: 1 },
+  { name: "ix_fact_time_location_severity" }
+);
 
 print("Colecciones e indices creados en traffic_bi");
