@@ -1,5 +1,5 @@
-import { Component, inject, computed, OnInit, OnDestroy } from '@angular/core';
-import { NgFor, DecimalPipe } from '@angular/common';
+import { Component, inject, signal, computed, effect, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule, NgFor, DecimalPipe } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData } from 'chart.js';
@@ -7,6 +7,7 @@ import {
   Chart, CategoryScale, LinearScale, PointElement,
   LineElement, BarElement, ArcElement, Filler,
   Tooltip, Legend,
+  LineController, DoughnutController,  // ← agrega estos dos
 } from 'chart.js';
 
 import { FiltersService } from '../../core/services/filters.service';
@@ -18,13 +19,14 @@ Chart.register(
   CategoryScale, LinearScale, PointElement,
   LineElement, BarElement, ArcElement, Filler,
   Tooltip, Legend,
+  LineController, DoughnutController,  // ← agrega estos dos
 );
 
 @Component({
   selector: 'app-overview',
   standalone: true,
   imports: [
-    NgFor, DecimalPipe,
+    CommonModule, NgFor, DecimalPipe,
     LucideAngularModule,
     BaseChartDirective,
     FiltersBarComponent,
@@ -44,38 +46,60 @@ export class OverviewComponent implements OnInit, OnDestroy {
   kpis = this.dashboard.kpis;
   heatmapCells = this.dashboard.heatmapCells;
 
-  trendChartData = computed<ChartData<'line'>>(() => {
+ trendChartData = signal<ChartData<'line'>>({ labels: [], datasets: [] });
+
+constructor() {
+  effect(() => {
     const data = this.dashboard.monthlyTrend();
-    return {
+    if (!data?.length) return;
+
+    this.trendChartData.set({
       labels: data.map(d => d.label),
       datasets: [
         {
-          label:           'Accidentes',
-          data:            data.map(d => d.accidents),
-          borderColor:     '#3b82f6',
-          backgroundColor: 'rgba(59, 130, 246, 0.08)',
-          borderWidth:     2.5,
-          pointRadius:     3,
-          pointHoverRadius: 6,
+          label:                'Accidentes',
+          data:                 data.map(d => d.accidents),
+          borderColor:          '#3b82f6',
+          backgroundColor:      'rgba(59, 130, 246, 0.08)',
+          borderWidth:          2.5,
+          pointRadius:          3,
+          pointHoverRadius:     6,
           pointBackgroundColor: '#3b82f6',
-          tension:         0.4,
-          fill:            true,
+          tension:              0.4,
+          fill:                 true,
         },
         {
-          label:           'Graves (est.)',
-          data:            data.map(d => d.fatalities),
-          borderColor:     '#dc2626',
-          backgroundColor: 'rgba(220, 38, 38, 0.06)',
-          borderWidth:     2,
-          pointRadius:     2,
-          pointHoverRadius: 5,
+          label:                'Graves (est.)',
+          data:                 data.map(d => d.fatalities),
+          borderColor:          '#dc2626',
+          backgroundColor:      'rgba(220, 38, 38, 0.06)',
+          borderWidth:          2,
+          pointRadius:          2,
+          pointHoverRadius:     5,
           pointBackgroundColor: '#dc2626',
-          tension:         0.4,
-          fill:            true,
+          tension:              0.4,
+          fill:                 true,
         },
       ],
-    };
+    });
   });
+   effect(() => {
+    const data = this.dashboard.severityDistribution();
+    if (!data?.length) return;
+
+    this.severityChartData.set({
+      labels:   data.map(d => d.label),
+      datasets: [{
+        data:                 data.map(d => d.value),
+        backgroundColor:      data.map(d => d.color),
+        hoverBackgroundColor: data.map(d => d.color),
+        borderWidth:          0,
+        hoverOffset:          6,
+      }],
+    });
+  });
+
+}
 
   trendChartOptions: ChartConfiguration<'line'>['options'] = {
     responsive:          true,
@@ -124,19 +148,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
     },
   };
 
-  severityChartData = computed<ChartData<'doughnut'>>(() => {
-    const data = this.dashboard.severityDistribution();
-    return {
-      labels:   data.map(d => d.label),
-      datasets: [{
-        data:             data.map(d => d.value),
-        backgroundColor:  data.map(d => d.color),
-        hoverBackgroundColor: data.map(d => d.color),
-        borderWidth:      0,
-        hoverOffset:      6,
-      }],
-    };
-  });
+  severityChartData = signal<ChartData<'doughnut'>>({ labels: [], datasets: [] });
 
   severityChartOptions: ChartConfiguration<'doughnut'>['options'] = {
     responsive:          true,

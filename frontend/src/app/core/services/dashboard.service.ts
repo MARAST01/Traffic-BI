@@ -18,6 +18,7 @@ import {
   HourlyPointDto,
   PaginatedAccidentsResponse,
   TrendPointDto,
+  StateRankingDto,
 } from '../models/analytics-api.model';
 
 export type DashboardPage =
@@ -161,24 +162,48 @@ export class DashboardService {
 
   private loadOverview(params: ReturnType<typeof filtersToQueryParams>): void {
     forkJoin({
-      kpis: this.analytics.getKpis(params),
-      trend: this.analytics.getTrend(params),
-      severity: this.analytics.getSeverityDistribution(params),
-      ranking: this.analytics.getStateRanking(params),
+      kpis: this.analytics.getKpis(params).pipe(
+        catchError(err => {
+          this.error.set(this.extractError(err));
+          return of<BackendKpis | null>(null);
+        }),
+      ),
+      trend: this.analytics.getTrend(params).pipe(
+        catchError(err => {
+          this.error.set(this.extractError(err));
+          return of<TrendPointDto[]>([]);
+        }),
+      ),
+      severity: this.analytics.getSeverityDistribution(params).pipe(
+        catchError(err => {
+          this.error.set(this.extractError(err));
+          return of<{ severity: number; count: number }[]>([]);
+        }),
+      ),
+      ranking: this.analytics.getStateRanking(params).pipe(
+        catchError(err => {
+          this.error.set(this.extractError(err));
+          return of<StateRankingDto[]>([]);
+        }),
+      ),
     }).pipe(
-      catchError(err => {
-        this.error.set(this.extractError(err));
-        return of(null);
-      }),
       takeUntilDestroyed(this.destroyRef),
     ).subscribe(result => {
       this.loading.set(false);
-      if (!result) return;
-      this.kpis.set(this.mapKpis(result.kpis));
-      this.monthlyTrend.set(this.mapTrend(result.trend));
-      this.severityDistribution.set(this.mapSeverity(result.severity));
-      this.stateRanking.set(result.ranking);
-      this.heatmapCells.set(this.rankingToHeatmap(result.ranking));
+      console.log('trend desde API:', result.trend);
+      if (result.kpis) {
+        this.kpis.set(this.mapKpis(result.kpis));
+      }
+      if (result.trend.length) {
+        this.monthlyTrend.set(this.mapTrend(result.trend));
+      }
+      if (result.severity.length) {
+        this.severityDistribution.set(this.mapSeverity(result.severity));
+      }
+      if (result.ranking.length) {
+        this.stateRanking.set(result.ranking);
+        this.heatmapCells.set(this.rankingToHeatmap(result.ranking));
+      }
     });
   }
 
