@@ -9,11 +9,20 @@
       </span>
     </div>
 
-    <div class="filters-bar__selects">
+    <!-- Skeleton mientras cargan las opciones -->
+    <div class="filters-bar__selects" *ngIf="!optionsLoaded()">
+      <div class="filter-group" *ngFor="let _ of [1,2,3,4,5]">
+        <label>&nbsp;</label>
+        <div class="filter-select filter-select--skeleton"></div>
+      </div>
+    </div>
+
+    <!-- Selects reales: solo se montan cuando las opciones ya están disponibles -->
+    <div class="filters-bar__selects" *ngIf="optionsLoaded()">
 
       <div class="filter-group">
         <label>Año</label>
-        <select [value]="draft().year" (change)="updateDraft('year', $event)" class="filter-select">
+        <select [value]="safeYear()" (change)="updateDraft('year', $event)" class="filter-select">
           <option *ngFor="let y of years()" [value]="y">{{ y }}</option>
         </select>
       </div>
@@ -27,7 +36,7 @@
 
       <div class="filter-group">
         <label>Estado</label>
-        <select [value]="draft().state" (change)="updateDraft('state', $event)" class="filter-select">
+        <select [value]="safeState()" (change)="updateDraft('state', $event)" class="filter-select">
           <option *ngFor="let s of states()" [value]="s">{{ s }}</option>
         </select>
       </div>
@@ -41,7 +50,7 @@
 
       <div class="filter-group">
         <label>Clima</label>
-        <select [value]="draft().weather" (change)="updateDraft('weather', $event)" class="filter-select">
+        <select [value]="safeWeather()" (change)="updateDraft('weather', $event)" class="filter-select">
           <option *ngFor="let w of weathers()" [value]="w">{{ w }}</option>
         </select>
       </div>
@@ -51,7 +60,6 @@
 
   <div class="filters-bar__actions">
 
-    <!-- Limpiar: solo si hay filtros activos -->
     <button
       class="btn-reset"
       *ngIf="hasActive()"
@@ -62,7 +70,6 @@
       Limpiar
     </button>
 
-    <!-- Aplicar: SIEMPRE visible -->
     <button class="btn-apply" (click)="apply()" title="Aplicar filtros">
       <lucide-icon name="Search" [size]="14" />
       Aplicar

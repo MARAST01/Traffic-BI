@@ -52,9 +52,9 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['Analista'],
   },
   {
-    path:  '/users',
-    label: 'Gestión de Usuarios',
-    icon:  'Users',
+    path:  '/ia',
+    label: 'Análisis con IA',
+    icon:  'Activity',
     roles: ['Administrador'],
   },
   {

@@ -1,1 +1,129 @@
-<p>audit-logs works!</p>
+<div class="audit-page">
+
+  <!-- ── Header ──────────────────────────────────────────── -->
+  <div class="audit-header">
+    <div class="audit-header__title">
+      <lucide-icon name="ScrollText" [size]="20" />
+      <div>
+        <h1>Registro de Auditoría</h1>
+        <p>Historial de consultas realizadas por los usuarios del sistema</p>
+      </div>
+    </div>
+    <div class="audit-header__meta" *ngIf="total() > 0">
+      <span class="total-badge">{{ total() }} registros</span>
+    </div>
+  </div>
+
+  <!-- ── Estado: cargando / error ─────────────────────────── -->
+  <div class="audit-status audit-status--loading" *ngIf="loading()">
+    <lucide-icon name="Loader" [size]="18" class="spin" />
+    Cargando registros…
+  </div>
+
+  <div class="audit-status audit-status--error" *ngIf="error() && !loading()">
+    <lucide-icon name="AlertCircle" [size]="16" />
+    {{ error() }}
+  </div>
+
+  <!-- ── Tabla ─────────────────────────────────────────────── -->
+  <div class="audit-table-wrapper" *ngIf="!loading() && !error()">
+    <table class="audit-table">
+      <thead>
+        <tr>
+          <th>Fecha y hora</th>
+          <th>Usuario</th>
+          <th>Rol</th>
+          <th>Módulo</th>
+          <th>Filtros aplicados</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let log of logs()">
+
+          <!-- Fecha -->
+          <td class="col-date">
+            <span class="date-main">{{ log.createdAt | date: 'dd/MM/yyyy' }}</span>
+            <span class="date-time">{{ log.createdAt | date: 'HH:mm:ss' }}</span>
+          </td>
+
+          <!-- Usuario -->
+          <td class="col-user">
+            <div class="user-cell">
+              <div class="user-avatar">{{ log.userName.charAt(0).toUpperCase() }}</div>
+              <div>
+                <span class="user-name">{{ log.userName }}</span>
+                <span class="user-email">{{ log.userEmail }}</span>
+              </div>
+            </div>
+          </td>
+
+          <!-- Rol -->
+          <td class="col-role">
+            <span class="role-chip" [class]="roleClass(log.userRole)">
+              {{ log.userRole }}
+            </span>
+          </td>
+
+          <!-- Módulo -->
+          <td class="col-page">
+            <span class="page-chip">{{ pageLabel(log.page) }}</span>
+          </td>
+
+          <!-- Filtros -->
+          <td class="col-filters">
+            <ng-container *ngIf="hasActiveFilters(log); else noFilters">
+              <span
+                class="filter-tag"
+                *ngFor="let f of formatFilters(log)"
+              >
+                <span class="filter-tag__label">{{ f.label }}</span>
+                <span class="filter-tag__value">{{ f.value }}</span>
+              </span>
+            </ng-container>
+            <ng-template #noFilters>
+              <span class="no-filters">Sin filtros — todos los datos</span>
+            </ng-template>
+          </td>
+
+        </tr>
+
+        <!-- Empty state -->
+        <tr *ngIf="logs().length === 0">
+          <td colspan="5" class="empty-row">
+            <lucide-icon name="Inbox" [size]="32" />
+            <p>No hay registros de auditoría todavía.</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── Paginación ─────────────────────────────────────────── -->
+  <div class="audit-pagination" *ngIf="totalPages() > 1">
+    <button
+      class="page-btn page-btn--nav"
+      [disabled]="currentPage() === 1"
+      (click)="goTo(currentPage() - 1)"
+    >
+      <lucide-icon name="ChevronLeft" [size]="16" />
+    </button>
+
+    <button
+      class="page-btn"
+      *ngFor="let p of pages()"
+      [class.page-btn--active]="p === currentPage()"
+      (click)="goTo(p)"
+    >
+      {{ p }}
+    </button>
+
+    <button
+      class="page-btn page-btn--nav"
+      [disabled]="currentPage() === totalPages()"
+      (click)="goTo(currentPage() + 1)"
+    >
+      <lucide-icon name="ChevronRight" [size]="16" />
+    </button>
+  </div>
+
+</div>
