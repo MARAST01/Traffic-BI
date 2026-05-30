@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { UsersService } from './users/users.service';
 import { AccidentsModule } from './accidents/accidents.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { AuditLogModule } from './audit/audit.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
     UsersModule,
     AccidentsModule,
     AnalyticsModule,
+    AuditLogModule,
   ],
 })
 export class AppModule implements OnModuleInit {
