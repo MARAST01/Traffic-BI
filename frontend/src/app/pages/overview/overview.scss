@@ -1,3 +1,10 @@
+// Compensa la altura de la barra de filtros fija.
+// Ajusta --filters-bar-height si cambias el padding de .filters-bar.
+:host {
+  display: block;
+  padding-top: var(--filters-bar-height, 60px);
+}
+
 .dashboard-status {
   margin: 0.5rem 0 0;
   padding:  0.5rem 0.75rem;

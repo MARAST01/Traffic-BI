@@ -193,6 +193,10 @@ constructor() {
     this.dashboard.disconnect();
   }
 
+  onApplyFilters() {
+    this.dashboard.reload();
+  }
+
   onDownloadReport(format: 'pdf' | 'xlsx') {
     this.dashboard.exportReport(format);
   }

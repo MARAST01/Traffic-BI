@@ -1,5 +1,8 @@
 <!-- Barra de filtros -->
-<app-filters-bar (downloadReport)="onDownloadReport($event)" />
+<app-filters-bar
+  (downloadReport)="onDownloadReport($event)"
+  (applyFilters)="onApplyFilters()"
+/>
 
 @if (loading()) {
   <p class="dashboard-status">Cargando datos…</p>

@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, DestroyRef } from '@angular/core';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { debounceTime, distinctUntilChanged, forkJoin, catchError, of, tap } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { distinctUntilChanged, forkJoin, catchError, of } from 'rxjs';
 import { FiltersService } from './filters.service';
 import { AnalyticsService } from './analytics.service';
 import { AccidentsService } from './accidents.service';
@@ -58,22 +58,22 @@ export class DashboardService {
   readonly tableData = signal<PaginatedAccidentsResponse | null>(null);
 
   constructor() {
-    toObservable(this.filtersService.filters)
-      .pipe(
-        debounceTime(400),
-        distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
-        tap(() => {
-          const page = this.activePage();
-          if (page) this.reload(page);
-        }),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe();
+    // La recarga ya no es automática: se dispara manualmente
+    // desde el componente al presionar "Aplicar" en la barra de filtros.
   }
 
+  /** Carga inicial silenciosa — sin mostrar el indicador de loading */
   connect(page: DashboardPage): void {
     this.activePage.set(page);
-    this.reload(page);
+    this._reload(page, true);
+  }
+
+  /** Recarga manual (al presionar Aplicar) — muestra el indicador de loading */
+  reload(page?: DashboardPage): void {
+    const target = page ?? this.activePage();
+    if (!target) return;
+    if (page) this.activePage.set(page);
+    this._reload(target, false);
   }
 
   disconnect(): void {
@@ -136,9 +136,9 @@ export class DashboardService {
     return this.tableData()?.total ?? 0;
   }
 
-  private reload(page: DashboardPage): void {
+  private _reload(page: DashboardPage, silent = false): void {
     const params = filtersToQueryParams(this.filtersService.filters());
-    this.loading.set(true);
+    if (!silent) this.loading.set(true);
     this.error.set(null);
 
     switch (page) {
