@@ -1,4 +1,4 @@
-import { Component, inject, output, signal } from '@angular/core';
+import { Component, inject, output, signal, computed } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import {
@@ -21,10 +21,10 @@ export class FiltersBarComponent {
 
   private filtersService = inject(FiltersService);
 
-  activeCount = this.filtersService.activeCount;
-  hasActive   = this.filtersService.hasActiveFilters;
+  activeCount   = this.filtersService.activeCount;
+  hasActive     = this.filtersService.hasActiveFilters;
+  optionsLoaded = this.filtersService.optionsLoaded;
 
-  // Borrador local — no toca el servicio hasta presionar Aplicar
   draft = signal<AccidentFilters>({ ...this.filtersService.filters() });
 
   years      = this.filtersService.years;
@@ -32,6 +32,11 @@ export class FiltersBarComponent {
   states     = this.filtersService.states;
   severities = SEVERITIES;
   weathers   = this.filtersService.weathers;
+
+  // Valor seguro para cada select: si la opción no existe aún, usa 'Todos'
+  safeYear    = computed(() => this.years().includes(this.draft().year)      ? this.draft().year     : 'Todos');
+  safeState   = computed(() => this.states().includes(this.draft().state)    ? this.draft().state    : 'Todos');
+  safeWeather = computed(() => this.weathers().includes(this.draft().weather) ? this.draft().weather : 'Todos');
 
   updateDraft(key: keyof AccidentFilters, event: Event) {
     const val = (event.target as HTMLSelectElement).value;
@@ -49,7 +54,6 @@ export class FiltersBarComponent {
   reset() {
     this.filtersService.reset();
     this.draft.set({ ...this.filtersService.filters() });
-    // También recarga al limpiar
     this.applyFilters.emit();
   }
 

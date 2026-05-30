@@ -4,6 +4,7 @@ import { distinctUntilChanged, forkJoin, catchError, of } from 'rxjs';
 import { FiltersService } from './filters.service';
 import { AnalyticsService } from './analytics.service';
 import { AccidentsService } from './accidents.service';
+import { AuditLogService } from './audit-log.service';
 import { filtersToQueryParams, formatSeverityLabel, formatWeatherLabel, monthLabelFromIsoDate, severityColor, weatherChartColor } from '../utils/filter-mapper';
 import {
   KPIData,
@@ -39,9 +40,10 @@ const EMPTY_KPIS: KPIData = {
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
   private readonly filtersService = inject(FiltersService);
-  private readonly analytics = inject(AnalyticsService);
-  private readonly accidents = inject(AccidentsService);
-  private readonly destroyRef = inject(DestroyRef);
+  private readonly analytics      = inject(AnalyticsService);
+  private readonly accidents      = inject(AccidentsService);
+  private readonly auditLog       = inject(AuditLogService);
+  private readonly destroyRef     = inject(DestroyRef);
 
   private activePage = signal<DashboardPage | null>(null);
 
@@ -68,11 +70,19 @@ export class DashboardService {
     this._reload(page, true);
   }
 
-  /** Recarga manual (al presionar Aplicar) — muestra el indicador de loading */
+  /** Recarga manual (al presionar Aplicar) — muestra el indicador de loading y registra auditoría */
   reload(page?: DashboardPage): void {
     const target = page ?? this.activePage();
     if (!target) return;
     if (page) this.activePage.set(page);
+
+    // Registrar la consulta en auditoría (fire-and-forget, no bloquea la UI)
+    const f = this.filtersService.filters();
+    this.auditLog.register(
+      { year: f.year, month: f.month, state: f.state, severity: f.severity, weather: f.weather },
+      target,
+    ).pipe(catchError(() => of(null))).subscribe();
+
     this._reload(target, false);
   }
 
