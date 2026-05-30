@@ -1,4 +1,4 @@
-import { Component, inject, output } from '@angular/core';
+import { Component, inject, output, signal } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import {
@@ -17,26 +17,40 @@ import {
 })
 export class FiltersBarComponent {
   downloadReport = output<'pdf' | 'xlsx'>();
+  applyFilters   = output<void>();
 
   private filtersService = inject(FiltersService);
 
-  filters = this.filtersService.filters;
   activeCount = this.filtersService.activeCount;
-  hasActive = this.filtersService.hasActiveFilters;
+  hasActive   = this.filtersService.hasActiveFilters;
 
-  years = this.filtersService.years;
-  months = MONTHS;
-  states = this.filtersService.states;
+  // Borrador local — no toca el servicio hasta presionar Aplicar
+  draft = signal<AccidentFilters>({ ...this.filtersService.filters() });
+
+  years      = this.filtersService.years;
+  months     = MONTHS;
+  states     = this.filtersService.states;
   severities = SEVERITIES;
-  weathers = this.filtersService.weathers;
+  weathers   = this.filtersService.weathers;
 
-  update(key: keyof AccidentFilters, event: Event) {
+  updateDraft(key: keyof AccidentFilters, event: Event) {
     const val = (event.target as HTMLSelectElement).value;
-    this.filtersService.update(key, val);
+    this.draft.update(prev => ({ ...prev, [key]: val }));
+  }
+
+  apply() {
+    const d = this.draft();
+    (Object.keys(d) as (keyof AccidentFilters)[]).forEach(k => {
+      this.filtersService.update(k, d[k] as string);
+    });
+    this.applyFilters.emit();
   }
 
   reset() {
     this.filtersService.reset();
+    this.draft.set({ ...this.filtersService.filters() });
+    // También recarga al limpiar
+    this.applyFilters.emit();
   }
 
   onDownload(format: 'pdf' | 'xlsx') {

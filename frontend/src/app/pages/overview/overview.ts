@@ -181,6 +181,10 @@ export class OverviewComponent implements OnInit, OnDestroy {
     this.dashboard.disconnect();
   }
 
+  onApplyFilters() {
+    this.dashboard.reload();
+  }
+
   onDownloadReport(format: 'pdf' | 'xlsx') {
     this.dashboard.exportReport(format);
   }

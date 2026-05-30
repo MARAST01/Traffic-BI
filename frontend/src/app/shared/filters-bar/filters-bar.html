@@ -1,7 +1,6 @@
 <div class="filters-bar">
 
   <div class="filters-bar__left">
-    <!-- Ícono + título -->
     <div class="filters-bar__title">
       <lucide-icon name="SlidersHorizontal" [size]="16" />
       <span>Filtros</span>
@@ -10,60 +9,39 @@
       </span>
     </div>
 
-    <!-- Selects -->
     <div class="filters-bar__selects">
 
       <div class="filter-group">
         <label>Año</label>
-        <select
-          [value]="filters().year"
-          (change)="update('year', $event)"
-          class="filter-select"
-        >
+        <select [value]="draft().year" (change)="updateDraft('year', $event)" class="filter-select">
           <option *ngFor="let y of years()" [value]="y">{{ y }}</option>
         </select>
       </div>
 
       <div class="filter-group">
         <label>Mes</label>
-        <select
-          [value]="filters().month"
-          (change)="update('month', $event)"
-          class="filter-select"
-        >
+        <select [value]="draft().month" (change)="updateDraft('month', $event)" class="filter-select">
           <option *ngFor="let month of months" [value]="month">{{ month }}</option>
         </select>
       </div>
 
       <div class="filter-group">
         <label>Estado</label>
-        <select
-          [value]="filters().state"
-          (change)="update('state', $event)"
-          class="filter-select"
-        >
+        <select [value]="draft().state" (change)="updateDraft('state', $event)" class="filter-select">
           <option *ngFor="let s of states()" [value]="s">{{ s }}</option>
         </select>
       </div>
 
       <div class="filter-group">
         <label>Severidad</label>
-        <select
-          [value]="filters().severity"
-          (change)="update('severity', $event)"
-          class="filter-select"
-        >
+        <select [value]="draft().severity" (change)="updateDraft('severity', $event)" class="filter-select">
           <option *ngFor="let sv of severities" [value]="sv">{{ sv }}</option>
         </select>
       </div>
 
       <div class="filter-group">
         <label>Clima</label>
-        <select
-          [value]="filters().weather"
-          (change)="update('weather', $event)"
-          class="filter-select"
-        >
+        <select [value]="draft().weather" (change)="updateDraft('weather', $event)" class="filter-select">
           <option *ngFor="let w of weathers()" [value]="w">{{ w }}</option>
         </select>
       </div>
@@ -71,8 +49,9 @@
     </div>
   </div>
 
-  <!-- Acciones -->
   <div class="filters-bar__actions">
+
+    <!-- Limpiar: solo si hay filtros activos -->
     <button
       class="btn-reset"
       *ngIf="hasActive()"
@@ -81,6 +60,12 @@
     >
       <lucide-icon name="X" [size]="14" />
       Limpiar
+    </button>
+
+    <!-- Aplicar: SIEMPRE visible -->
+    <button class="btn-apply" (click)="apply()" title="Aplicar filtros">
+      <lucide-icon name="Search" [size]="14" />
+      Aplicar
     </button>
 
     <button class="btn-download btn-download--secondary" (click)="onDownload('pdf')">
@@ -92,6 +77,7 @@
       <lucide-icon name="Download" [size]="15" />
       Excel
     </button>
+
   </div>
 
 </div>
