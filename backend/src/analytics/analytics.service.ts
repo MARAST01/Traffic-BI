@@ -191,7 +191,7 @@ export class AnalyticsService {
       },
       { $sort: { _id: 1 } },
       { $project: { _id: 0, date: '$_id', count: '$count' } },
-    ]);
+    ]).exec();
   }
 
   async getSeverityDistribution(filters: AnalyticsFilterDto) {
@@ -201,7 +201,7 @@ export class AnalyticsService {
       { $group: { _id: '$severity', count: { $sum: 1 } } },
       { $sort: { _id: 1 } },
       { $project: { _id: 0, severity: '$_id', count: '$count' } },
-    ]);
+    ]).exec();
   }
 
   async getHeatmap(filters: AnalyticsFilterDto) {
@@ -236,7 +236,7 @@ export class AnalyticsService {
       { $group: { _id: { $hour: '$start_time' }, count: { $sum: 1 } } },
       { $sort: { _id: 1 } },
       { $project: { _id: 0, hour: '$_id', count: '$count' } },
-    ]);
+    ]).exec();
   }
 
   async getStateRanking(filters: AnalyticsFilterDto, limit = 15) {
@@ -294,7 +294,7 @@ export class AnalyticsService {
           count: '$count',
         },
       },
-    ]);
+    ]).exec();
   }
 
   async getPoiImpact(filters: AnalyticsFilterDto) {
