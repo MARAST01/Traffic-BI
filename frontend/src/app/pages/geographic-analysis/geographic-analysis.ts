@@ -8,6 +8,7 @@ import {
   CategoryScale,
   LinearScale,
   BarElement,
+  BarController,
   Tooltip,
   Legend,
 } from 'chart.js';
@@ -16,7 +17,7 @@ import { FiltersBarComponent } from '../../shared/filters-bar/filters-bar';
 import { FiltersService } from '../../core/services/filters.service';
 import { DashboardService } from '../../core/services/dashboard.service';
 
-Chart.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
+Chart.register(CategoryScale, LinearScale, BarElement, BarController, Tooltip, Legend);
 
 @Component({
   selector: 'app-geographic-analysis',
@@ -80,6 +81,10 @@ export class GeographicAnalysis implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.dashboard.disconnect();
+  }
+
+  onApplyFilters() {
+    this.dashboard.reload();
   }
 
   onDownloadReport(format: 'pdf' | 'xlsx') {

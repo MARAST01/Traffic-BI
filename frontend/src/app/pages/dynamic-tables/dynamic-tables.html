@@ -1,4 +1,11 @@
-<app-filters-bar (downloadReport)="onDownloadReport($event)" />
+<app-filters-bar (downloadReport)="onDownloadReport($event)" (applyFilters)="onApplyFilters()" />
+
+@if (loading()) {
+  <p class="dashboard-status">Cargando datos…</p>
+}
+@if (error()) {
+  <p class="dashboard-status dashboard-status--error">{{ error() }}</p>
+}
 
 <div class="tables-dashboard">
   <section class="hero-card">
@@ -25,7 +32,13 @@
       <span class="page-badge">Página {{ currentPage() }} de {{ totalPages() }}</span>
     </div>
 
-    <div class="table-wrapper">
+    <div class="table-wrapper" [class.table-wrapper--loading]="loading()">
+      @if (loading()) {
+        <div class="table-loading-overlay">
+          <lucide-icon name="LoaderCircle" [size]="28" class="spin-icon" />
+          <span>Aplicando filtros…</span>
+        </div>
+      }
       <table class="data-table">
         <thead>
           <tr>
