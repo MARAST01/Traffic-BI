@@ -1,0 +1,323 @@
+<!-- IA.html — Riesgo de Accidente Dashboard -->
+<section class="ia-dashboard">
+
+  <!-- SKELETON LOADER -->
+  <ng-container *ngIf="isLoading">
+    <div class="skeleton-wrap">
+      <div class="skel-header">
+        <div class="skel skel--icon"></div>
+        <div>
+          <div class="skel skel--title"></div>
+          <div class="skel skel--subtitle"></div>
+        </div>
+      </div>
+      <div class="skel skel--gauge"></div>
+      <div class="skel-cards">
+        <div class="skel skel--card"></div>
+        <div class="skel skel--card"></div>
+      </div>
+      <p class="loading-caption">
+        <span class="dot-anim"></span>
+        Consultando datos y calculando riesgo…
+      </p>
+    </div>
+  </ng-container>
+
+  <!-- ERROR STATE -->
+  <ng-container *ngIf="!isLoading && hasError">
+    <div class="error-state">
+      <span class="error-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </span>
+      <h3>No se pudo obtener el análisis de riesgo</h3>
+      <p>Verifica tu conexión o contacta al equipo técnico.</p>
+      <button class="btn-retry" (click)="loadRiskData()">Reintentar</button>
+    </div>
+  </ng-container>
+
+  <!-- MAIN CONTENT -->
+  <ng-container *ngIf="!isLoading && !hasError && data">
+
+    <!-- Header -->
+    <header class="dash-header">
+      <div class="dash-header__left">
+        <span class="dash-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </span>
+        <div>
+          <h2 class="dash-title">Riesgo de Accidente</h2>
+          <p class="dash-zone">{{ data.zone }}</p>
+        </div>
+      </div>
+      <div class="dash-header__right">
+        <span class="last-update">{{ data.timestamp | date:'HH:mm' }}</span>
+        <button class="btn-refresh" (click)="loadRiskData()" title="Actualizar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"/>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- GAUGE -->
+    <div class="gauge-section">
+      <div class="gauge-wrap" [attr.data-level]="data.riskLevel">
+        <svg class="gauge-svg" viewBox="0 0 300 200"
+             xmlns="http://www.w3.org/2000/svg" aria-label="Indicador de riesgo">
+          <defs>
+            <filter id="needleGlow">
+              <feGaussianBlur stdDeviation="2.5" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+
+          <!-- Track arc -->
+          <circle cx="150" cy="150" r="100" fill="none"
+                  stroke="var(--gauge-track)" stroke-width="16"
+                  [attr.stroke-dasharray]="trackDash"
+                  [attr.stroke-dashoffset]="progressOffset"
+                  stroke-linecap="round"/>
+
+          <!-- Progress arc -->
+          <circle cx="150" cy="150" r="100" fill="none"
+                  [attr.class]="'gauge-arc gauge-arc--' + data.riskLevel"
+                  stroke-width="16"
+                  [attr.stroke-dasharray]="getProgressDash(displayScore)"
+                  [attr.stroke-dashoffset]="progressOffset"
+                  stroke-linecap="round"/>
+
+          
+
+<g font-size="11" font-weight="600" text-anchor="middle" fill="var(--gauge-text-color, #666)">
+  
+  <g transform="rotate(-135, 150, 150)">
+    <line x1="150" y1="50" x2="150" y2="40" stroke="var(--gauge-tick-color, #ccc)" stroke-width="2"/>
+    <text x="150" y="28" transform="rotate(135, 150, 28)" class="gauge-label">0</text>
+  </g>
+
+  <g transform="rotate(-108, 150, 150)">
+    <line x1="150" y1="50" x2="150" y2="42" stroke="var(--gauge-tick-color, #ccc)" stroke-width="1.5"/>
+    <text x="150" y="30" transform="rotate(108, 150, 30)" class="gauge-label">10</text>
+  </g>
+
+  <g transform="rotate(-81, 150, 150)">
+    <line x1="150" y1="50" x2="150" y2="42" stroke="var(--gauge-tick-color, #ccc)" stroke-width="1.5"/>
+    <text x="150" y="30" transform="rotate(81, 150, 30)" class="gauge-label">20</text>
+  </g>
+
+  <g transform="rotate(-54, 150, 150)">
+    <line x1="150" y1="50" x2="150" y2="42" stroke="var(--gauge-tick-color, #ccc)" stroke-width="1.5"/>
+    <text x="150" y="30" transform="rotate(54, 150, 30)" class="gauge-label">30</text>
+  </g>
+
+  <g transform="rotate(-27, 150, 150)">
+    <line x1="150" y1="50" x2="150" y2="42" stroke="var(--gauge-tick-color, #ccc)" stroke-width="1.5"/>
+    <text x="150" y="30" transform="rotate(27, 150, 30)" class="gauge-label">40</text>
+  </g>
+
+  <g transform="rotate(0, 150, 150)">
+    <line x1="150" y1="50" x2="150" y2="40" stroke="var(--gauge-tick-color, #ccc)" stroke-width="2"/>
+    <text x="150" y="28" class="gauge-label">50</text>
+  </g>
+
+  <g transform="rotate(27, 150, 150)">
+    <line x1="150" y1="50" x2="150" y2="42" stroke="var(--gauge-tick-color, #ccc)" stroke-width="1.5"/>
+    <text x="150" y="30" transform="rotate(-27, 150, 30)" class="gauge-label">60</text>
+  </g>
+
+  <g transform="rotate(54, 150, 150)">
+    <line x1="150" y1="50" x2="150" y2="42" stroke="var(--gauge-tick-color, #ccc)" stroke-width="1.5"/>
+    <text x="150" y="30" transform="rotate(-54, 150, 30)" class="gauge-label">70</text>
+  </g>
+
+  <g transform="rotate(81, 150, 150)">
+    <line x1="150" y1="50" x2="150" y2="42" stroke="var(--gauge-tick-color, #ccc)" stroke-width="1.5"/>
+    <text x="150" y="30" transform="rotate(-81, 150, 30)" class="gauge-label">80</text>
+  </g>
+
+  <g transform="rotate(108, 150, 150)">
+    <line x1="150" y1="50" x2="150" y2="42" stroke="var(--gauge-tick-color, #ccc)" stroke-width="1.5"/>
+    <text x="150" y="30" transform="rotate(-108, 150, 30)" class="gauge-label">90</text>
+  </g>
+
+  <g transform="rotate(135, 150, 150)">
+    <line x1="150" y1="50" x2="150" y2="40" stroke="var(--gauge-tick-color, #ccc)" stroke-width="2"/>
+    <text x="150" y="28" transform="rotate(-135, 150, 28)" class="gauge-label">100</text>
+  </g>
+
+</g>
+<path d="M 150 55 L 146 150 L 154 150 Z"
+      class="gauge-needle-shadow" 
+      [attr.transform]="'rotate(' + getNeedleRotation(displayScore) + ', 150, 150) translate(2,3)'"/>
+
+<path d="M 150 55 L 146 150 L 154 150 Z"
+      class="gauge-needle" 
+      filter="url(#needleGlow)"
+      [attr.transform]="'rotate(' + getNeedleRotation(displayScore) + ', 150, 150)'"/>
+          <!-- Pivot -->
+          <circle cx="150" cy="150" r="12" class="gauge-pivot-ring"/>
+          <circle cx="150" cy="150" r="5"  class="gauge-pivot-dot"/>
+
+          <!-- Score -->
+          <text x="150" y="176" class="gauge-score">{{ displayScore }}</text>
+          <text x="150" y="193" class="gauge-sublabel">de 100</text>
+        </svg>
+
+        <div class="risk-badge" [attr.data-level]="data.riskLevel">
+          {{ riskLevelLabel() }}
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO GRID -->
+    <div class="info-grid">
+
+      <!-- Clima -->
+      <div class="card weather-card">
+        <h3 class="card__title">
+          <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+          </svg>
+          Clima actual
+        </h3>
+
+        <div class="weather-hero">
+          <div class="weather-condition-icon" [attr.data-cond]="data.weather.condition">
+            <!-- rain -->
+            <svg *ngIf="data.weather.condition === 'rain'" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/>
+              <line x1="8" y1="19" x2="8" y2="21"/><line x1="8" y1="13" x2="8" y2="15"/>
+              <line x1="12" y1="15" x2="12" y2="17"/><line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="16" y1="13" x2="16" y2="15"/><line x1="16" y1="19" x2="16" y2="21"/>
+            </svg>
+            <!-- storm -->
+            <svg *ngIf="data.weather.condition === 'storm'" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9"/>
+              <polyline points="13 11 9 17 15 17 11 23"/>
+            </svg>
+            <!-- fog -->
+            <svg *ngIf="data.weather.condition === 'fog'" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="15" x2="21" y2="15"/><line x1="3" y1="19" x2="21" y2="19"/>
+              <path d="M9 11A3 3 0 0 1 15 11"/><path d="M5 11a7 7 0 0 1 14 0"/>
+            </svg>
+            <!-- clear -->
+            <svg *ngIf="data.weather.condition === 'clear'" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+            </svg>
+            <!-- cloud -->
+            <svg *ngIf="data.weather.condition === 'cloud'" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+            </svg>
+            <!-- snow -->
+            <svg *ngIf="data.weather.condition === 'snow'" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/>
+              <polyline points="17 7 12 12 7 7"/><polyline points="7 17 12 12 17 17"/>
+            </svg>
+          </div>
+          <div class="weather-main">
+            <span class="weather-temp">{{ data.weather.temperature }}°C</span>
+            <span class="weather-cond-label">{{ weatherConditionLabel() }}</span>
+          </div>
+        </div>
+
+        <div class="weather-stats">
+          <div class="ws-item">
+            <span class="ws-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+              </svg>
+            </span>
+            <span class="ws-label">Humedad</span>
+            <span class="ws-bar">
+              <span class="ws-bar-fill" [style.width.%]="data.weather.humidity"></span>
+            </span>
+            <span class="ws-value">{{ data.weather.humidity }}%</span>
+          </div>
+          <div class="ws-item">
+            <span class="ws-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9.59 4.59A2 2 0 1 1 11 8H2"/>
+                <path d="M12.59 19.41A2 2 0 1 0 14 16H2"/>
+                <path d="M6.59 11.41A2 2 0 1 1 8 15H2"/>
+              </svg>
+            </span>
+            <span class="ws-label">Viento</span>
+            <span class="ws-bar">
+              <span class="ws-bar-fill" [style.width.%]="data.weather.windSpeed / 1.2"></span>
+            </span>
+            <span class="ws-value">{{ data.weather.windSpeed }} km/h</span>
+          </div>
+          <div class="ws-item">
+            <span class="ws-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </span>
+            <span class="ws-label">Visibilidad</span>
+            <span class="ws-bar">
+              <span class="ws-bar-fill" [style.width.%]="data.weather.visibility * 10"></span>
+            </span>
+            <span class="ws-value">{{ data.weather.visibility }} km</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Factores -->
+      <div class="card factors-card">
+        <h3 class="card__title">
+          <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          Factores de riesgo
+        </h3>
+        <ul class="factors-list">
+          <li class="factor-item"
+              *ngFor="let factor of data.factors; trackBy: trackByName">
+            <div class="factor-top">
+              <span class="factor-name">{{ factor.name }}</span>
+              <span [class]="impactBadgeClass(factor.impact)">
+                {{ factor.impact === 'high' ? 'ALTO' : factor.impact === 'medium' ? 'MEDIO' : 'BAJO' }}
+              </span>
+            </div>
+            <div class="factor-bar">
+              <div class="factor-bar-fill"
+                   [attr.data-impact]="factor.impact"
+                   [style.width]="factor.impact === 'high' ? '90%' : factor.impact === 'medium' ? '55%' : '25%'">
+              </div>
+            </div>
+            <p class="factor-desc">{{ factor.description }}</p>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </ng-container>
+
+</section>
