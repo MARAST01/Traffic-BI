@@ -48,11 +48,11 @@ export const routes: Routes = [
           import('./pages/dynamic-tables/dynamic-tables').then((m) => m.DynamicTables),
       },
       {
-        path: 'users',
+        path: 'ia',
         canActivate: [roleGuard],
         data: { roles: ['Administrador'] },
         loadComponent: () =>
-          import('./pages/user-management/user-management').then((m) => m.UserManagement),
+          import('./pages/IA/IA').then((m) => m.IA),
       },
       {
         path: 'logs',
