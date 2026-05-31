@@ -222,3 +222,45 @@
   .hero-card { align-items: flex-start; flex-direction: column; }
   .hero-stats { width: 100%; }
 }
+// ── Loading states ────────────────────────────────────────────
+.panel--chart {
+  position: relative;
+}
+
+.chart-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #64748b;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+.heatmap-grid--blurred,
+.chart-shell--blurred,
+.hotspot-list--blurred {
+  opacity: 0.35;
+  filter: blur(1.5px);
+  pointer-events: none;
+  transition: opacity 200ms, filter 200ms;
+}
+
+.spin-icon {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.geo-dashboard--loading {
+  .hero-card { opacity: 0.7; }
+}

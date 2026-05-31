@@ -1,6 +1,13 @@
-<app-filters-bar (downloadReport)="onDownloadReport($event)" />
+<app-filters-bar (downloadReport)="onDownloadReport($event)" (applyFilters)="onApplyFilters()" />
 
-<div class="temporal-dashboard">
+@if (loading()) {
+  <p class="dashboard-status">Cargando datos…</p>
+}
+@if (error()) {
+  <p class="dashboard-status dashboard-status--error">{{ error() }}</p>
+}
+
+<div class="temporal-dashboard" [class.temporal-dashboard--loading]="loading()">
   <section class="hero-card">
     <div>
       <p class="eyebrow">Análisis temporal</p>
@@ -20,14 +27,20 @@
   </section>
 
   <section class="dashboard-grid">
-    <article class="panel panel--wide">
+    <article class="panel panel--wide panel--chart">
       <div class="panel__header">
         <div>
           <h3>Tendencia mensual</h3>
           <p>Accidentes y fatalidades por mes</p>
         </div>
       </div>
-      <div class="chart-shell">
+      @if (loading()) {
+        <div class="chart-loading-overlay">
+          <lucide-icon name="LoaderCircle" [size]="26" class="spin-icon" />
+          <span>Actualizando…</span>
+        </div>
+      }
+      <div class="chart-shell" [class.chart-shell--blurred]="loading()">
         <canvas
           baseChart
           [data]="trendChartData()"
@@ -37,14 +50,20 @@
       </div>
     </article>
 
-    <article class="panel">
+    <article class="panel panel--chart">
       <div class="panel__header">
         <div>
           <h3>Distribución por turno</h3>
           <p>Volumen de accidentes por rango horario</p>
         </div>
       </div>
-      <div class="chart-shell chart-shell--small">
+      @if (loading()) {
+        <div class="chart-loading-overlay">
+          <lucide-icon name="LoaderCircle" [size]="26" class="spin-icon" />
+          <span>Actualizando…</span>
+        </div>
+      }
+      <div class="chart-shell chart-shell--small" [class.chart-shell--blurred]="loading()">
         <canvas
           baseChart
           [data]="hourlyChartData()"
@@ -55,7 +74,7 @@
     </article>
   </section>
 
-  <section class="panel">
+  <section class="panel panel--chart">
     <div class="panel__header">
       <div>
         <h3>Resumen temporal</h3>
@@ -63,7 +82,14 @@
       </div>
     </div>
 
-    <div class="summary-grid">
+    @if (loading()) {
+      <div class="chart-loading-overlay">
+        <lucide-icon name="LoaderCircle" [size]="26" class="spin-icon" />
+        <span>Actualizando…</span>
+      </div>
+    }
+
+    <div class="summary-grid" [class.summary-grid--blurred]="loading()">
       <div class="summary-tile" *ngFor="let point of monthlyTrend().slice(0, 6)">
         <span class="summary-tile__label">{{ point.label }}</span>
         <strong class="summary-tile__value">{{ point.accidents | number }}</strong>

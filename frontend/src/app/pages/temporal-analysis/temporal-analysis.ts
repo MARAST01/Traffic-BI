@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData } from 'chart.js';
-import { Chart, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Tooltip, Legend } from 'chart.js';
+import { Chart, CategoryScale, LinearScale, PointElement, LineElement, LineController, BarElement, BarController, Tooltip, Legend } from 'chart.js';
 
 import { FiltersService } from '../../core/services/filters.service';
 import { DashboardService } from '../../core/services/dashboard.service';
 import { FiltersBarComponent } from '../../shared/filters-bar/filters-bar';
 
-Chart.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Tooltip, Legend);
+Chart.register(CategoryScale, LinearScale, PointElement, LineElement, LineController, BarElement, BarController, Tooltip, Legend);
 
 @Component({
   selector: 'app-temporal-analysis',
@@ -117,6 +117,10 @@ export class TemporalAnalysis implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.dashboard.disconnect();
+  }
+
+  onApplyFilters() {
+    this.dashboard.reload();
   }
 
   onDownloadReport(format: 'pdf' | 'xlsx') {

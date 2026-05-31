@@ -85,6 +85,11 @@ export class DynamicTables implements OnInit, OnDestroy {
     this.dashboard.loadTablePage(next, this.pageSize);
   }
 
+  onApplyFilters() {
+    this.currentPage.set(1);
+    this.dashboard.reload();
+  }
+
   onDownloadReport(format: 'pdf' | 'xlsx') {
     this.dashboard.exportReport(format);
   }

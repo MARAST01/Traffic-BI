@@ -1,8 +1,11 @@
-<!-- Barra de filtros -->
+<!-- Barra de filtros fija -->
 <app-filters-bar
   (downloadReport)="onDownloadReport($event)"
   (applyFilters)="onApplyFilters()"
 />
+
+<!-- Espaciador para compensar la altura del filters-bar fijo -->
+<div class="filters-bar-offset"></div>
 
 @if (loading()) {
   <p class="dashboard-status">Cargando datos…</p>

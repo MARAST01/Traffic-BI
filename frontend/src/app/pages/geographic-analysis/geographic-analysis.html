@@ -1,6 +1,13 @@
-<app-filters-bar (downloadReport)="onDownloadReport($event)" />
+<app-filters-bar (downloadReport)="onDownloadReport($event)" (applyFilters)="onApplyFilters()" />
 
-<div class="geo-dashboard">
+@if (loading()) {
+  <p class="dashboard-status">Cargando datos…</p>
+}
+@if (error()) {
+  <p class="dashboard-status dashboard-status--error">{{ error() }}</p>
+}
+
+<div class="geo-dashboard" [class.geo-dashboard--loading]="loading()">
   <section class="hero-card">
     <div>
       <p class="eyebrow">Mapa de calor</p>
@@ -20,7 +27,7 @@
   </section>
 
   <section class="dashboard-grid">
-    <article class="panel panel--wide">
+    <article class="panel panel--wide panel--chart">
       <div class="panel__header">
         <div>
           <h3>Calor regional</h3>
@@ -34,7 +41,14 @@
         </div>
       </div>
 
-      <div class="heatmap-grid">
+      @if (loading()) {
+        <div class="chart-loading-overlay">
+          <lucide-icon name="LoaderCircle" [size]="26" class="spin-icon" />
+          <span>Actualizando…</span>
+        </div>
+      }
+
+      <div class="heatmap-grid" [class.heatmap-grid--blurred]="loading()">
         <article
           class="heat-cell"
           *ngFor="let cell of heatmapCells()"
@@ -50,7 +64,7 @@
       </div>
     </article>
 
-    <article class="panel panel--right">
+    <article class="panel panel--right panel--chart">
       <div class="panel__header">
         <div>
           <h3>Top hotspots</h3>
@@ -58,7 +72,14 @@
         </div>
       </div>
 
-      <div class="chart-shell">
+      @if (loading()) {
+        <div class="chart-loading-overlay">
+          <lucide-icon name="LoaderCircle" [size]="26" class="spin-icon" />
+          <span>Actualizando…</span>
+        </div>
+      }
+
+      <div class="chart-shell" [class.chart-shell--blurred]="loading()">
         <canvas
           baseChart
           [data]="hotspotChartData()"
@@ -69,7 +90,7 @@
     </article>
   </section>
 
-  <section class="panel">
+  <section class="panel panel--chart">
     <div class="panel__header">
       <div>
         <h3>Detalle de concentración</h3>
@@ -77,7 +98,14 @@
       </div>
     </div>
 
-    <div class="hotspot-list">
+    @if (loading()) {
+      <div class="chart-loading-overlay">
+        <lucide-icon name="LoaderCircle" [size]="26" class="spin-icon" />
+        <span>Actualizando…</span>
+      </div>
+    }
+
+    <div class="hotspot-list" [class.hotspot-list--blurred]="loading()">
       <div class="hotspot-row" *ngFor="let item of hotspots(); let index = index">
         <div class="hotspot-row__rank">{{ index + 1 }}</div>
         <div class="hotspot-row__name">{{ item.state }}</div>

@@ -1,6 +1,8 @@
 .filters-bar {
-  position: sticky;
+  position: fixed;
   top: var(--topbar-height);
+  left: var(--sidebar-width, 280px);
+  width: calc(100% - var(--sidebar-width, 280px));
   z-index: 30;
   background: #ffffff;
   border-bottom: 1px solid var(--color-border);

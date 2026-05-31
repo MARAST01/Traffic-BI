@@ -2,14 +2,14 @@ import { Component, computed, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { BaseChartDirective } from 'ng2-charts';
-import { Chart, CategoryScale, LinearScale, ArcElement, Tooltip, Legend, BarElement } from 'chart.js';
+import { Chart, CategoryScale, LinearScale, ArcElement, DoughnutController, Tooltip, Legend, BarElement, BarController } from 'chart.js';
 import { ChartConfiguration, ChartData } from 'chart.js';
 
 import { FiltersService } from '../../core/services/filters.service';
 import { DashboardService } from '../../core/services/dashboard.service';
 import { FiltersBarComponent } from '../../shared/filters-bar/filters-bar';
 
-Chart.register(CategoryScale, LinearScale, ArcElement, BarElement, Tooltip, Legend);
+Chart.register(CategoryScale, LinearScale, ArcElement, DoughnutController, BarElement, BarController, Tooltip, Legend);
 
 @Component({
   selector: 'app-associated-factors',
@@ -88,6 +88,9 @@ export class AssociatedFactors implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.dashboard.disconnect();
+  }
+  onApplyFilters() {
+    this.dashboard.reload();
   }
 
   onDownloadReport(format: 'pdf' | 'xlsx') {

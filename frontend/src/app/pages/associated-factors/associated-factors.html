@@ -1,6 +1,13 @@
-<app-filters-bar (downloadReport)="onDownloadReport($event)" />
+<app-filters-bar (downloadReport)="onDownloadReport($event)" (applyFilters)="onApplyFilters()" />
 
-<div class="factors-dashboard">
+@if (loading()) {
+  <p class="dashboard-status">Cargando datos…</p>
+}
+@if (error()) {
+  <p class="dashboard-status dashboard-status--error">{{ error() }}</p>
+}
+
+<div class="factors-dashboard" [class.factors-dashboard--loading]="loading()">
   <section class="hero-card">
     <div>
       <p class="eyebrow">Factores asociados</p>
@@ -10,14 +17,20 @@
   </section>
 
   <section class="dashboard-grid">
-    <article class="panel">
+    <article class="panel panel--chart">
       <div class="panel__header">
         <div>
           <h3>Severidad</h3>
           <p>Distribución del nivel de impacto del incidente</p>
         </div>
       </div>
-      <div class="chart-shell">
+      @if (loading()) {
+        <div class="chart-loading-overlay">
+          <lucide-icon name="LoaderCircle" [size]="26" class="spin-icon" />
+          <span>Actualizando…</span>
+        </div>
+      }
+      <div class="chart-shell" [class.chart-shell--blurred]="loading()">
         <canvas
           baseChart
           [data]="severityChartData()"
@@ -27,14 +40,20 @@
       </div>
     </article>
 
-    <article class="panel">
+    <article class="panel panel--chart">
       <div class="panel__header">
         <div>
           <h3>Clima</h3>
           <p>Concentración por tipo de condición meteorológica</p>
         </div>
       </div>
-      <div class="chart-shell chart-shell--bar">
+      @if (loading()) {
+        <div class="chart-loading-overlay">
+          <lucide-icon name="LoaderCircle" [size]="26" class="spin-icon" />
+          <span>Actualizando…</span>
+        </div>
+      }
+      <div class="chart-shell chart-shell--bar" [class.chart-shell--blurred]="loading()">
         <canvas
           baseChart
           [data]="weatherChartData()"
@@ -45,7 +64,7 @@
     </article>
   </section>
 
-  <section class="panel">
+  <section class="panel panel--chart">
     <div class="panel__header">
       <div>
         <h3>Top factores asociados</h3>
@@ -53,7 +72,14 @@
       </div>
     </div>
 
-    <div class="factor-list">
+    @if (loading()) {
+      <div class="chart-loading-overlay">
+        <lucide-icon name="LoaderCircle" [size]="26" class="spin-icon" />
+        <span>Actualizando…</span>
+      </div>
+    }
+
+    <div class="factor-list" [class.factor-list--blurred]="loading()">
       <div class="factor-row" *ngFor="let item of factorRows()">
         <div class="factor-row__meta">
           <span class="factor-row__label">{{ item.label }}</span>
